@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Рецептура и Технологическая карта PRO v2.2</title>
+    <title data-i18n="pageTitle">Рецептура и Технологическая карта PRO v2.3</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -52,16 +52,68 @@
         .footnote { font-size: .85rem; color: var(--muted); text-align: center; margin-top: 20px; }
         input[type="number"] { text-align: right; }
         
+        /* Стили для "зеркала печати" - по умолчанию скрыто */
+        .print-content {
+            display: none;
+        }
+
         @media print {
-            body { background: #fff; color: #000; }
-            .app { max-width: none; margin: 0; padding: 10px; }
-            .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-            .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
-            input, select, textarea { border: none; padding: 2px; background: transparent; color: #000; -webkit-print-color-adjust: exact; width: 100%; }
-            h1, h2 { color: #000; page-break-after: avoid; }
-            th, .phase-header td, .total-row td { background-color: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; }
-            table { page-break-inside: auto; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
+            body {
+                background: #fff;
+                color: #000;
+            }
+            /* Убираем отступы для максимального использования страницы */
+            .app {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+            }
+            .card {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+                padding: 10px; /* Небольшой отступ внутри карточек */
+            }
+            .toolbar, .section-actions, .row-actions, .no-print {
+                display: none !important;
+            }
+            input, select {
+                border: none;
+                padding: 2px;
+                background: transparent;
+                color: #000;
+                -webkit-print-color-adjust: exact;
+                width: 100%;
+            }
+            h1, h2 {
+                color: #000;
+                page-break-after: avoid;
+            }
+            th, .phase-header td, .total-row td {
+                background-color: #eee !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+            }
+            table {
+                page-break-inside: auto;
+            }
+            tr {
+                page-break-inside: avoid;
+                page-break-after: auto;
+            }
+
+            /* Ключевое изменение: скрываем textarea и показываем div с полным текстом */
+            textarea {
+                display: none !important;
+            }
+            .print-content {
+                display: block !important;
+                white-space: pre-wrap; /* Сохраняет переносы строк и пробелы */
+                word-break: break-word; /* Переносит длинные слова */
+                font-family: inherit;
+                font-size: inherit;
+            }
         }
     </style>
 </head>
@@ -136,8 +188,14 @@
 <template id="procRowTpl">
     <tr>
         <td class="step-cell" style="text-align: center; font-weight: bold;"></td>
-        <td><textarea class="data-field" data-key="description" placeholder="Нагреть фазу А до 75°C..." rows="2"></textarea></td>
-        <td><textarea class="data-field" data-key="equipment" placeholder="Реактор РМГ-100. Мешалка: 50 rpm" rows="2"></textarea></td>
+        <td>
+            <textarea class="data-field" data-key="description" placeholder="Нагреть фазу А до 75°C..." rows="2"></textarea>
+            <div class="print-content" data-key="description-print"></div>
+        </td>
+        <td>
+            <textarea class="data-field" data-key="equipment" placeholder="Реактор РМГ-100. Мешалка: 50 rpm" rows="2"></textarea>
+            <div class="print-content" data-key="equipment-print"></div>
+        </td>
         <td><input class="data-field" data-key="temp" type="text" placeholder="75-80"></td>
         <td><input class="data-field" data-key="time" type="text" placeholder="15-20"></td>
         <td class="no-print row-actions"><button class="btn secondary small upBtn" title="Переместить вверх">↑</button><button class="btn secondary small downBtn" title="Переместить вниз">↓</button><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
@@ -148,7 +206,7 @@
 // --- INTERNATIONALIZATION DATA ---
 const I18N = {
     ru: {
-        pageTitle: "Рецептура и Технологическая карта PRO v2.2", title: "Рецептура и Тех. Карта", print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON",
+        pageTitle: "Рецептура и Технологическая карта PRO v2.3", title: "Рецептура и Тех. Карта", print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON",
         meta: "Карточка изделия", productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата", author: "Технолог", batchSize: "Размер партии (кг)",
         formulation: "Рецептура", totalPercent: "Сумма %:", phase: "Фаза", inci: "INCI", trade: "Торговое наименование", percent: "% (w/w)", mass: "Масса (кг)", actions: "Действия", addIngredient: "➕ Добавить ингредиент",
         process: "Технологические стадии", step: "Шаг", description: "Описание операции", equipment: "Оборудование и режим", temp: "Темп. °C", time: "Время мин", addStep: "➕ Добавить стадию",
@@ -156,7 +214,7 @@ const I18N = {
         phaseA: "ФАЗА A - Водная", phaseB: "ФАЗА B - Масляная", phaseC: "ФАЗА C - Активы/Охлаждение", phaseD: "ФАЗА D", phaseE: "ФАЗА E", total: "ИТОГО"
     },
     en: {
-        pageTitle: "Formulation & Tech Card PRO v2.2", title: "Formulation & Tech Card", print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON",
+        pageTitle: "Formulation & Tech Card PRO v2.3", title: "Formulation & Tech Card", print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON",
         meta: "Product Master Data", productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Date", author: "Technologist", batchSize: "Batch Size (kg)",
         formulation: "Formulation", totalPercent: "Total %:", phase: "Phase", inci: "INCI", trade: "Trade Name", percent: "% (w/w)", mass: "Mass (kg)", actions: "Actions", addIngredient: "➕ Add Ingredient",
         process: "Process Steps", step: "Step", description: "Operation Description", equipment: "Equipment & Mode", temp: "Temp °C", time: "Time min", addStep: "➕ Add Step",
@@ -169,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM & STATE SETUP ---
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "formulation_pro_draft_v2.2";
+    const STORAGE_KEY = "formulation_pro_draft_v2.3";
 
     let state = {
         meta: { productName: '', productCode: '', docVersion: '1.0', docDate: '', author: '', batchSize: 100 },
@@ -203,10 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         for (const phase of sortedPhases) {
-            const phaseHeader = `
-                <tr class="phase-header">
-                    <td colspan="6">${I18N[lang][`phase${phase}`] || `PHASE ${phase}`}</td>
-                </tr>`;
+            const phaseHeader = `<tr class="phase-header"><td colspan="6">${I18N[lang][`phase${phase}`] || `PHASE ${phase}`}</td></tr>`;
             tbody.insertAdjacentHTML('beforeend', phaseHeader);
 
             grouped[phase].forEach(ing => {
@@ -236,8 +291,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tpl.querySelector('tr');
             row.dataset.id = step.id;
             row.querySelector('.step-cell').textContent = index + 1;
-            row.querySelector('[data-key="description"]').value = step.description || '';
-            row.querySelector('[data-key="equipment"]').value = step.equipment || '';
+            
+            // Populate both textarea and its print mirror
+            const descTextarea = row.querySelector('[data-key="description"]');
+            const descPrintDiv = row.querySelector('[data-key="description-print"]');
+            descTextarea.value = step.description || '';
+            descPrintDiv.textContent = step.description || '';
+
+            const equipTextarea = row.querySelector('[data-key="equipment"]');
+            const equipPrintDiv = row.querySelector('[data-key="equipment-print"]');
+            equipTextarea.value = step.equipment || '';
+            equipPrintDiv.textContent = step.equipment || '';
+
             row.querySelector('[data-key="temp"]').value = step.temp || '';
             row.querySelector('[data-key="time"]').value = step.time || '';
             tbody.appendChild(row);
@@ -296,6 +361,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = state[type].find(i => i.id === id);
         if (item) {
             item[key] = value;
+            // Sync textarea content to its print mirror in real-time
+            if (e.target.tagName === 'TEXTAREA') {
+                const printMirror = e.target.nextElementSibling;
+                if (printMirror) {
+                    printMirror.textContent = value;
+                }
+            }
             if (type === 'ingredients' && key === 'percent') {
                 const batchSize = parseFloat(state.meta.batchSize) || 0;
                 row.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(value) || 0) / 100).toFixed(3);
@@ -360,37 +432,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.click();
-        URL.revokeObjectURL(url);
+        a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url);
     };
 
     const handleLoadFile = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
             try {
                 const loaded = JSON.parse(ev.target.result);
                 if (loaded.meta && Array.isArray(loaded.ingredients) && Array.isArray(loaded.processSteps)) {
-                    loadState(loaded);
-                    alert('Данные успешно загружены!');
-                } else {
-                    throw new Error("Неверная структура файла");
-                }
-            } catch (err) {
-                alert('Ошибка чтения файла: ' + err.message);
-            }
+                    loadState(loaded); alert('Данные успешно загружены!');
+                } else { throw new Error("Неверная структура файла"); }
+            } catch (err) { alert('Ошибка чтения файла: ' + err.message); }
         };
-        reader.readAsText(file);
-        e.target.value = '';
+        reader.readAsText(file); e.target.value = '';
     };
 
     // --- INITIALIZATION ---
     function initialize() {
-        // Setup event listeners
         $('#langSel').addEventListener('change', (e) => setLanguage(e.target.value));
         $('#printBtn').addEventListener('click', () => window.print());
         $('#saveBtn').addEventListener('click', handleSaveFile);
@@ -404,29 +464,18 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#formBody').addEventListener('click', (e) => handleGenericActions(e, 'ingredients'));
         $('#procBody').addEventListener('click', (e) => handleGenericActions(e, 'processSteps'));
 
-        ['#productName', '#productCode', '#docVersion', '#docDate', '#author'].forEach(id => {
-            $(id).addEventListener('input', saveState);
-        });
-        $('#batchSize').addEventListener('input', () => {
-            saveState();
-            renderIngredients();
-        });
+        ['#productName', '#productCode', '#docVersion', '#docDate', '#author'].forEach(id => $(id).addEventListener('input', saveState));
+        $('#batchSize').addEventListener('input', () => { saveState(); renderIngredients(); });
 
-        // Load initial data
         const savedState = localStorage.getItem(STORAGE_KEY);
         if (savedState) {
-            try {
-                loadState(JSON.parse(savedState));
-            } catch (e) {
+            try { loadState(JSON.parse(savedState)); } 
+            catch (e) {
                 console.error('Ошибка загрузки из localStorage:', e);
-                $('#docDate').valueAsDate = new Date();
-                state.meta.docDate = $('#docDate').value;
-                renderAll();
+                $('#docDate').valueAsDate = new Date(); state.meta.docDate = $('#docDate').value; renderAll();
             }
         } else {
-            $('#docDate').valueAsDate = new Date();
-            state.meta.docDate = $('#docDate').value;
-            renderAll();
+            $('#docDate').valueAsDate = new Date(); state.meta.docDate = $('#docDate').value; renderAll();
         }
         
         setLanguage($('#langSel').value);
