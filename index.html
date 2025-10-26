@@ -26,7 +26,7 @@
             margin: 0;
             line-height: 1.5;
         }
-        .app { max-width: 1200px; margin: 24px auto; padding: 0 16px 64px; }
+        .app { max-width: 1400px; margin: 24px auto; padding: 0 16px 64px; }
         h1 { font-size: 1.8rem; margin: 0 0 12px; color: #34495e; }
         h2 { font-size: 1.2rem; margin: 24px 0 12px; color: #34495e; border-bottom: 2px solid var(--header-bg); padding-bottom: 8px; }
         .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 16px; }
@@ -34,17 +34,15 @@
         .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 16px; }
         label { font-size: .9rem; color: var(--muted); font-weight: 600; margin-bottom: 4px; display: block; }
         input, select, textarea, button {
-            background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-size: .95rem;
+            background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-size: .95rem; width: 100%; box-sizing: border-box;
         }
         input:focus, select:focus, textarea:focus { outline: 2px solid #3498db; border-color: transparent; }
         input::placeholder, textarea::placeholder { color: #bdc3c7; }
-        textarea { width: 100%; resize: vertical; min-height: 60px; }
+        textarea { resize: vertical; min-height: 60px; }
         .grid { display: grid; gap: 16px; }
         .grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-        .ok { color: var(--accent); }
-        .warn { color: var(--warn); }
-        .bad { color: var(--danger); }
-        .btn { cursor: pointer; transition: all .1s ease; user-select: none; border: none; color: #fff; }
+        .ok { color: var(--accent); } .warn { color: var(--warn); } .bad { color: var(--danger); }
+        .btn { cursor: pointer; transition: all .1s ease; user-select: none; border: none; color: #fff; width: auto; }
         .btn:hover { opacity: 0.9; }
         .btn.primary { background: var(--primary-btn-bg); }
         .btn.secondary { background: #95a5a6; }
@@ -67,7 +65,7 @@
             .app { max-width: none; margin: 0; padding: 10px; }
             .card { box-shadow: none; border: 1px solid #ccc; }
             .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
-            input, select, textarea { border: none; padding: 0; background: transparent; color: #000; -webkit-print-color-adjust: exact; }
+            input, select, textarea { border: none; padding: 0; background: transparent; color: #000; -webkit-print-color-adjust: exact; width: 100%; }
             h1, h2 { color: #000; }
             th, .phase-header td, .total-row td { background-color: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; }
         }
@@ -91,7 +89,6 @@
         </div>
     </div>
 
-    <!-- HEADER / META -->
     <div class="card">
         <h2 data-i18n="meta">Карточка изделия</h2>
         <div class="grid cols-4">
@@ -100,7 +97,7 @@
             <div><label data-i18n="version">Версия</label><input id="docVersion" value="1.0" /></div>
             <div><label data-i18n="date">Дата</label><input id="docDate" type="date" /></div>
             <div><label data-i18n="author">Технолог</label><input id="author" /></div>
-            <div><label data-i18n="batchSize">Размер партии</label><input id="batchSize" type="number" min="0" step="0.01" value="100" /></div>
+            <div><label data-i18n="batchSize">Размер партии (кг)</label><input id="batchSize" type="number" min="0" step="0.01" value="100" /></div>
         </div>
     </div>
 
@@ -175,8 +172,8 @@
     <tr>
         <td class="step-cell"></td>
         <td><textarea class="data-field" data-key="description" placeholder="Нагреть фазу А до 75°C..."></textarea></td>
+        <td><textarea class="data-field" data-key="equipment" placeholder="Реактор РМГ-150. Мешалка: 50 rpm"></textarea></td>
         <td><input class="data-field" data-key="temp" placeholder="75"></td>
-        <td><input class="data-field" data-key="speed" placeholder="50-100"></td>
         <td><input class="data-field" data-key="time" placeholder="15"></td>
         <td class="no-print row-actions">
             <button class="btn secondary small upBtn">↑</button>
@@ -189,64 +186,56 @@
 <script>
 const I18N = {
     ru: {
-        pageTitle: "Рецептура и Технологическая карта PRO",
-        title: "Рецептура и Тех. Карта",
-        print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON",
+        pageTitle: "Рецептура и Технологическая карта PRO v2", title: "Рецептура и Тех. Карта", print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON",
         meta: "Карточка изделия", productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата", author: "Технолог", batchSize: "Размер партии (кг)",
         formulation: "Рецептура", totalPercent: "Сумма %:", phase: "Фаза", inci: "INCI", trade: "Торговое наименование", percent: "% (w/w)", mass: "Масса (кг)", actions: "Действия", addIngredient: "➕ Добавить ингредиент",
-        process: "Технологические стадии", step: "Шаг", description: "Описание операции", temp: "Темп. °C", speed: "Обороты rpm", time: "Время мин", addStep: "➕ Добавить стадию",
-        del: "Удалить",
-        foot: "Автосохранение включено. Экспортируйте в PDF через печать браузера.",
-        phaseA: "ФАЗА A - Водная", phaseB: "ФАЗА B - Масляная", phaseC: "ФАЗА C - Активы", phaseD: "ФАЗА D - Нейтрализация/Консервация",
-        total: "ИТОГО"
+        process: "Технологические стадии", step: "Шаг", description: "Описание операции", equipment: "Оборудование и режим", temp: "Темп. °C", time: "Время мин", addStep: "➕ Добавить стадию",
+        del: "Удалить", foot: "Автосохранение включено. Экспортируйте в PDF через печать браузера.",
+        phaseA: "ФАЗА A - Водная", phaseB: "ФАЗА B - Масляная", phaseC: "ФАЗА C - Активы/Охлаждение", total: "ИТОГО"
     },
     en: {
-        pageTitle: "Formulation & Tech Card PRO",
-        title: "Formulation & Tech Card",
-        print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON",
+        pageTitle: "Formulation & Tech Card PRO v2", title: "Formulation & Tech Card", print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON",
         meta: "Product Master Data", productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Date", author: "Technologist", batchSize: "Batch Size (kg)",
         formulation: "Formulation", totalPercent: "Total %:", phase: "Phase", inci: "INCI", trade: "Trade Name", percent: "% (w/w)", mass: "Mass (kg)", actions: "Actions", addIngredient: "➕ Add Ingredient",
-        process: "Process Steps", step: "Step", description: "Operation Description", temp: "Temp °C", speed: "Speed rpm", time: "Time min", addStep: "➕ Add Step",
-        del: "Delete",
-        foot: "Autosave is enabled. Export to PDF via browser print.",
-        phaseA: "PHASE A - Water", phaseB: "PHASE B - Oil", phaseC: "PHASE C - Actives", phaseD: "PHASE D - Neutralization/Preservation",
-        total: "TOTAL"
+        process: "Process Steps", step: "Step", description: "Operation Description", equipment: "Equipment & Mode", temp: "Temp °C", time: "Time min", addStep: "➕ Add Step",
+        del: "Delete", foot: "Autosave is enabled. Export to PDF via browser print.",
+        phaseA: "PHASE A - Water", phaseB: "PHASE B - Oil", phaseC: "PHASE C - Actives/Cooldown", total: "TOTAL"
     }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "formulation_pro_draft";
+    const STORAGE_KEY = "formulation_pro_draft_v2";
 
-    // --- STATE ---
     let state = {
         meta: { productName: '', productCode: '', docVersion: '1.0', docDate: '', author: '', batchSize: 100 },
         ingredients: [],
         processSteps: []
     };
 
-    // --- RENDER FUNCTIONS ---
     const renderIngredients = () => {
         const tbody = $('#formBody');
+        const focusedElement = document.activeElement;
+        const focusedId = focusedElement?.closest('tr')?.dataset.id;
+        const focusedKey = focusedElement?.dataset.key;
+
         tbody.innerHTML = '';
         const batchSize = parseFloat(state.meta.batchSize) || 0;
         const lang = $('#langSel').value;
 
         const grouped = state.ingredients.reduce((acc, ing) => {
-            const phase = ing.phase.toUpperCase() || '...';
+            const phase = (ing.phase || '...').toUpperCase();
             if (!acc[phase]) acc[phase] = [];
             acc[phase].push(ing);
             return acc;
         }, {});
 
-        const phaseOrder = ['A', 'B', 'C', 'D'];
+        const phaseOrder = ['A', 'B', 'C', 'D', 'E'];
         const sortedPhases = Object.keys(grouped).sort((a, b) => {
-            const indexA = phaseOrder.indexOf(a);
-            const indexB = phaseOrder.indexOf(b);
+            const indexA = phaseOrder.indexOf(a); const indexB = phaseOrder.indexOf(b);
             if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-            if (indexA !== -1) return -1;
-            if (indexB !== -1) return 1;
+            if (indexA !== -1) return -1; if (indexB !== -1) return 1;
             return a.localeCompare(b);
         });
 
@@ -273,10 +262,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         updateTotals();
+        restoreFocus(focusedId, focusedKey);
     };
 
     const renderProcess = () => {
         const tbody = $('#procBody');
+        const focusedElement = document.activeElement;
+        const focusedId = focusedElement?.closest('tr')?.dataset.id;
+        const focusedKey = focusedElement?.dataset.key;
+
         tbody.innerHTML = '';
         state.processSteps.forEach((step, index) => {
             const tpl = $('#procRowTpl').content.cloneNode(true);
@@ -284,19 +278,16 @@ document.addEventListener('DOMContentLoaded', () => {
             row.dataset.id = step.id;
             row.querySelector('.step-cell').textContent = index + 1;
             row.querySelector('[data-key="description"]').value = step.description;
+            row.querySelector('[data-key="equipment"]').value = step.equipment;
             row.querySelector('[data-key="temp"]').value = step.temp;
-            row.querySelector('[data-key="speed"]').value = step.speed;
             row.querySelector('[data-key="time"]').value = step.time;
             tbody.appendChild(row);
         });
+        restoreFocus(focusedId, focusedKey);
     };
 
-    const renderAll = () => {
-        renderIngredients();
-        renderProcess();
-    };
+    const renderAll = () => { renderIngredients(); renderProcess(); };
 
-    // --- UPDATE & CALCULATION FUNCTIONS ---
     const updateTotals = () => {
         const sum = state.ingredients.reduce((acc, ing) => acc + parseFloat(ing.percent || 0), 0);
         const sumEl = $('#sumPercent');
@@ -310,16 +301,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = el.getAttribute("data-i18n");
             if (I18N[lang][key]) el.textContent = I18N[lang][key];
         });
-        renderAll(); // Re-render for language-dependent content like phase headers
-    };
-
-    // --- EVENT HANDLERS ---
-    const handleGenericAdd = (type, defaultData) => {
-        state[type].push({ ...defaultData, id: Date.now() });
         renderAll();
     };
 
-    const handleGenericUpdate = (e, type, idKey) => {
+    const restoreFocus = (id, key) => {
+        if (id && key) {
+            const newElement = $(`tr[data-id="${id}"] [data-key="${key}"]`);
+            if (newElement) {
+                newElement.focus();
+                if (newElement.select) newElement.select();
+            }
+        }
+    };
+
+    const handleGenericAdd = (type, defaultData) => {
+        state[type].push({ ...defaultData, id: Date.now() });
+        if (type === 'ingredients') renderIngredients();
+        if (type === 'processSteps') renderProcess();
+    };
+
+    const handleGenericUpdate = (e, type) => {
         if (!e.target.classList.contains('data-field')) return;
         const row = e.target.closest('tr');
         const id = parseInt(row.dataset.id);
@@ -329,8 +330,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const item = state[type].find(i => i.id === id);
         if (item) {
             item[key] = value;
-            if (type === 'ingredients') {
-                renderIngredients(); // Re-render to update mass and totals
+            if (type === 'ingredients' && key === 'percent') {
+                const batchSize = parseFloat(state.meta.batchSize) || 0;
+                row.querySelector('.mass-cell').textContent = (batchSize * value / 100).toFixed(3);
+                updateTotals();
             }
         }
     };
@@ -341,95 +344,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = parseInt(row.dataset.id);
         const index = state[type].findIndex(i => i.id === id);
 
-        if (e.target.classList.contains('delBtn')) {
-            state[type].splice(index, 1);
-        }
-        if (e.target.classList.contains('upBtn') && index > 0) {
-            [state[type][index], state[type][index - 1]] = [state[type][index - 1], state[type][index]];
-        }
-        if (e.target.classList.contains('downBtn') && index < state[type].length - 1) {
-            [state[type][index], state[type][index + 1]] = [state[type][index + 1], state[type][index]];
-        }
-        renderAll();
+        if (e.target.classList.contains('delBtn')) state[type].splice(index, 1);
+        if (e.target.classList.contains('upBtn') && index > 0) [state[type][index], state[type][index - 1]] = [state[type][index - 1], state[type][index]];
+        if (e.target.classList.contains('downBtn') && index < state[type].length - 1) [state[type][index], state[type][index + 1]] = [state[type][index + 1], state[type][index]];
+        
+        if (type === 'ingredients') renderIngredients();
+        if (type === 'processSteps') renderProcess();
     };
 
-    // --- DATA & STORAGE ---
     const saveState = () => {
-        // Update meta from inputs before saving
-        state.meta.productName = $('#productName').value;
-        state.meta.productCode = $('#productCode').value;
-        state.meta.docVersion = $('#docVersion').value;
-        state.meta.docDate = $('#docDate').value;
-        state.meta.author = $('#author').value;
-        state.meta.batchSize = $('#batchSize').value;
+        state.meta.productName = $('#productName').value; state.meta.productCode = $('#productCode').value;
+        state.meta.docVersion = $('#docVersion').value; state.meta.docDate = $('#docDate').value;
+        state.meta.author = $('#author').value; state.meta.batchSize = $('#batchSize').value;
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     };
 
     const loadState = (data) => {
         state = data;
-        // Populate meta inputs from loaded state
-        $('#productName').value = state.meta.productName;
-        $('#productCode').value = state.meta.productCode;
-        $('#docVersion').value = state.meta.docVersion;
-        $('#docDate').value = state.meta.docDate;
-        $('#author').value = state.meta.author;
-        $('#batchSize').value = state.meta.batchSize;
+        $('#productName').value = state.meta.productName; $('#productCode').value = state.meta.productCode;
+        $('#docVersion').value = state.meta.docVersion; $('#docDate').value = state.meta.docDate;
+        $('#author').value = state.meta.author; $('#batchSize').value = state.meta.batchSize;
         renderAll();
     };
 
-    // --- INITIALIZATION ---
     $('#langSel').addEventListener('change', (e) => setLanguage(e.target.value));
     $('#printBtn').addEventListener('click', () => window.print());
-
     $('#addIngredientBtn').addEventListener('click', () => handleGenericAdd('ingredients', { phase: 'A', inci: '', tradeName: '', percent: 0 }));
-    $('#addProcBtn').addEventListener('click', () => handleGenericAdd('processSteps', { description: '', temp: '', speed: '', time: '' }));
-
+    $('#addProcBtn').addEventListener('click', () => handleGenericAdd('processSteps', { description: '', equipment: '', temp: '', time: '' }));
     $('#formBody').addEventListener('input', (e) => handleGenericUpdate(e, 'ingredients'));
     $('#procBody').addEventListener('input', (e) => handleGenericUpdate(e, 'processSteps'));
-
     $('#formBody').addEventListener('click', (e) => handleGenericActions(e, 'ingredients'));
     $('#procBody').addEventListener('click', (e) => handleGenericActions(e, 'processSteps'));
 
     $('#saveBtn').addEventListener('click', () => {
-        saveState(); // Ensure latest meta is captured
+        saveState();
         const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `${state.meta.productCode || 'formulation'}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+        a.href = url; a.download = `${state.meta.productCode || 'formulation'}.json`;
+        a.click(); URL.revokeObjectURL(url);
     });
 
     $('#loadInput').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+        const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const data = JSON.parse(ev.target.result);
-                loadState(data);
-            } catch (err) {
-                alert('Invalid JSON file.');
-            }
-        };
-        reader.readAsText(file);
-        e.target.value = '';
+        reader.onload = (ev) => { try { loadState(JSON.parse(ev.target.result)); } catch (err) { alert('Invalid JSON file.'); } };
+        reader.readAsText(file); e.target.value = '';
     });
 
-    // Autosave on any input change
     document.querySelector('.app').addEventListener('input', saveState);
 
-    // Initial load
     const savedState = localStorage.getItem(STORAGE_KEY);
-    if (savedState) {
-        loadState(JSON.parse(savedState));
-    } else {
-        // Set today's date by default
-        $('#docDate').valueAsDate = new Date();
-        state.meta.docDate = $('#docDate').value;
-        renderAll();
-    }
+    if (savedState) { loadState(JSON.parse(savedState)); } 
+    else { $('#docDate').valueAsDate = new Date(); state.meta.docDate = $('#docDate').value; renderAll(); }
     setLanguage($('#langSel').value);
 });
 </script>
