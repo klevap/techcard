@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="pageTitle">Рецептура и Технологическая карта PRO</title>
+    <style>
+        :root {
+            --bg: #f4f7f9;
+            --card: #ffffff;
+            --ink: #2c3e50;
+            --muted: #7f8c8d;
+            --accent: #27ae60;
+            --danger: #e74c3c;
+            --warn: #f39c12;
+            --line: #dfe4ea;
+            --header-bg: #ecf0f1;
+            --primary-btn-bg: #3498db;
+            --primary-btn-border: #2980b9;
+        }
+        html, body { height: 100%; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+            margin: 0;
+            line-height: 1.5;
+        }
+        .app { max-width: 1200px; margin: 24px auto; padding: 0 16px 64px; }
+        h1 { font-size: 1.8rem; margin: 0 0 12px; color: #34495e; }
+        h2 { font-size: 1.2rem; margin: 24px 0 12px; color: #34495e; border-bottom: 2px solid var(--header-bg); padding-bottom: 8px; }
+        .toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .toolbar .left, .toolbar .right { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); margin-bottom: 16px; }
+        label { font-size: .9rem; color: var(--muted); font-weight: 600; margin-bottom: 4px; display: block; }
+        input, select, textarea, button {
+            background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-size: .95rem;
+        }
+        input:focus, select:focus, textarea:focus { outline: 2px solid #3498db; border-color: transparent; }
+        input::placeholder, textarea::placeholder { color: #bdc3c7; }
+        textarea { width: 100%; resize: vertical; min-height: 60px; }
+        .grid { display: grid; gap: 16px; }
+        .grid.cols-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+        .ok { color: var(--accent); }
+        .warn { color: var(--warn); }
+        .bad { color: var(--danger); }
+        .btn { cursor: pointer; transition: all .1s ease; user-select: none; border: none; color: #fff; }
+        .btn:hover { opacity: 0.9; }
+        .btn.primary { background: var(--primary-btn-bg); }
+        .btn.secondary { background: #95a5a6; }
+        .btn.small { padding: 5px 10px; font-size: .85rem; border-radius: 6px; }
+        .row-actions { display: flex; gap: 6px; align-items: center; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border-bottom: 1px solid var(--line); padding: 10px; vertical-align: top; text-align: left; }
+        th { background: var(--header-bg); font-weight: 600; color: #34495e; }
+        tr:last-child td { border-bottom: none; }
+        .phase-header td { background: #3498db; color: white; font-weight: bold; border-bottom: 2px solid #2980b9; }
+        .total-row td { background: var(--header-bg); font-weight: bold; }
+        .kpi { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .kpi .box { background: var(--header-bg); border: 1px solid var(--line); padding: 8px 12px; border-radius: 8px; }
+        .spacer { flex: 1; }
+        .section-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 12px; }
+        .footnote { font-size: .85rem; color: var(--muted); text-align: center; margin-top: 20px; }
+        
+        @media print {
+            body { background: #fff; color: #000; }
+            .app { max-width: none; margin: 0; padding: 10px; }
+            .card { box-shadow: none; border: 1px solid #ccc; }
+            .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
+            input, select, textarea { border: none; padding: 0; background: transparent; color: #000; -webkit-print-color-adjust: exact; }
+            h1, h2 { color: #000; }
+            th, .phase-header td, .total-row td { background-color: #eee !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <div class="toolbar card">
+        <div class="left">
+            <h1 data-i18n="title">Рецептура и Тех. Карта</h1>
+        </div>
+        <div class="right">
+            <select id="langSel" aria-label="Language">
+                <option value="ru" selected>Русский</option>
+                <option value="en">English</option>
+            </select>
+            <button class="btn primary" id="printBtn" data-i18n="print">🖨️ Печать / PDF</button>
+            <button class="btn secondary" id="saveBtn" data-i18n="save">💾 Сохранить JSON</button>
+            <label class="btn secondary" for="loadInput" data-i18n="load">📁 Загрузить JSON</label>
+            <input type="file" id="loadInput" class="no-print" accept=".json" style="display:none" />
+        </div>
+    </div>
+
+    <!-- HEADER / META -->
+    <div class="card">
+        <h2 data-i18n="meta">Карточка изделия</h2>
+        <div class="grid cols-4">
+            <div><label data-i18n="productName">Наименование продукта</label><input id="productName" /></div>
+            <div><label data-i18n="productCode">Код / Артикул</label><input id="productCode" /></div>
+            <div><label data-i18n="version">Версия</label><input id="docVersion" value="1.0" /></div>
+            <div><label data-i18n="date">Дата</label><input id="docDate" type="date" /></div>
+            <div><label data-i18n="author">Технолог</label><input id="author" /></div>
+            <div><label data-i18n="batchSize">Размер партии</label><input id="batchSize" type="number" min="0" step="0.01" value="100" /></div>
+        </div>
+    </div>
+
+    <!-- FORMULATION -->
+    <div class="card">
+        <div class="kpi">
+            <h2 data-i18n="formulation">Рецептура</h2>
+            <span class="spacer"></span>
+            <div class="box"><span class="muted" data-i18n="totalPercent">Сумма %:</span> <strong id="sumPercent" class="ok">0.00%</strong></div>
+        </div>
+        <table id="formTable" aria-label="Formulation table">
+            <thead>
+                <tr>
+                    <th style="width:5%" data-i18n="phase">Фаза</th>
+                    <th style="width:25%" data-i18n="inci">INCI</th>
+                    <th style="width:25%" data-i18n="trade">Торговое наименование</th>
+                    <th style="width:10%" data-i18n="percent">% (w/w)</th>
+                    <th style="width:10%" data-i18n="mass">Масса (кг)</th>
+                    <th style="width:15%" class="no-print" data-i18n="actions">Действия</th>
+                </tr>
+            </thead>
+            <tbody id="formBody"></tbody>
+        </table>
+        <div class="section-actions no-print">
+            <button class="btn primary small" id="addIngredientBtn" data-i18n="addIngredient">➕ Добавить ингредиент</button>
+        </div>
+    </div>
+
+    <!-- PROCESS STEPS -->
+    <div class="card">
+        <h2 data-i18n="process">Технологические стадии</h2>
+        <table id="procTable" aria-label="Process steps table">
+            <thead>
+                <tr>
+                    <th style="width:5%" data-i18n="step">Шаг</th>
+                    <th style="width:40%" data-i18n="description">Описание операции</th>
+                    <th style="width:15%" data-i18n="temp">Темп. °C</th>
+                    <th style="width:15%" data-i18n="speed">Обороты rpm</th>
+                    <th style="width:15%" data-i18n="time">Время мин</th>
+                    <th style="width:10%" class="no-print" data-i18n="actions">Действия</th>
+                </tr>
+            </thead>
+            <tbody id="procBody"></tbody>
+        </table>
+        <div class="section-actions no-print">
+            <button class="btn primary small" id="addProcBtn" data-i18n="addStep">➕ Добавить стадию</button>
+        </div>
+    </div>
+    
+    <div class="footnote">
+        <span data-i18n="foot">Автосохранение включено. Экспортируйте в PDF через печать браузера.</span>
+    </div>
+</div>
+
+<!-- TEMPLATES -->
+<template id="ingredientRowTpl">
+    <tr>
+        <td><input class="data-field" data-key="phase" list="phaseList" placeholder="A"></td>
+        <td><input class="data-field" data-key="inci" placeholder="Aqua, Glycerin..."></td>
+        <td><input class="data-field" data-key="tradeName" placeholder="Purified Water"></td>
+        <td><input class="data-field" data-key="percent" type="number" min="0" step="0.01" value="0"></td>
+        <td class="mass-cell"></td>
+        <td class="no-print row-actions">
+            <button class="btn secondary small upBtn">↑</button>
+            <button class="btn secondary small downBtn">↓</button>
+            <button class="btn danger small delBtn" data-i18n="del">Удалить</button>
+        </td>
+    </tr>
+</template>
+
+<template id="procRowTpl">
+    <tr>
+        <td class="step-cell"></td>
+        <td><textarea class="data-field" data-key="description" placeholder="Нагреть фазу А до 75°C..."></textarea></td>
+        <td><input class="data-field" data-key="temp" placeholder="75"></td>
+        <td><input class="data-field" data-key="speed" placeholder="50-100"></td>
+        <td><input class="data-field" data-key="time" placeholder="15"></td>
+        <td class="no-print row-actions">
+            <button class="btn secondary small upBtn">↑</button>
+            <button class="btn secondary small downBtn">↓</button>
+            <button class="btn danger small delBtn" data-i18n="del">Удалить</button>
+        </td>
+    </tr>
+</template>
+
+<script>
+const I18N = {
+    ru: {
+        pageTitle: "Рецептура и Технологическая карта PRO",
+        title: "Рецептура и Тех. Карта",
+        print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON",
+        meta: "Карточка изделия", productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата", author: "Технолог", batchSize: "Размер партии (кг)",
+        formulation: "Рецептура", totalPercent: "Сумма %:", phase: "Фаза", inci: "INCI", trade: "Торговое наименование", percent: "% (w/w)", mass: "Масса (кг)", actions: "Действия", addIngredient: "➕ Добавить ингредиент",
+        process: "Технологические стадии", step: "Шаг", description: "Описание операции", temp: "Темп. °C", speed: "Обороты rpm", time: "Время мин", addStep: "➕ Добавить стадию",
+        del: "Удалить",
+        foot: "Автосохранение включено. Экспортируйте в PDF через печать браузера.",
+        phaseA: "ФАЗА A - Водная", phaseB: "ФАЗА B - Масляная", phaseC: "ФАЗА C - Активы", phaseD: "ФАЗА D - Нейтрализация/Консервация",
+        total: "ИТОГО"
+    },
+    en: {
+        pageTitle: "Formulation & Tech Card PRO",
+        title: "Formulation & Tech Card",
+        print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON",
+        meta: "Product Master Data", productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Date", author: "Technologist", batchSize: "Batch Size (kg)",
+        formulation: "Formulation", totalPercent: "Total %:", phase: "Phase", inci: "INCI", trade: "Trade Name", percent: "% (w/w)", mass: "Mass (kg)", actions: "Actions", addIngredient: "➕ Add Ingredient",
+        process: "Process Steps", step: "Step", description: "Operation Description", temp: "Temp °C", speed: "Speed rpm", time: "Time min", addStep: "➕ Add Step",
+        del: "Delete",
+        foot: "Autosave is enabled. Export to PDF via browser print.",
+        phaseA: "PHASE A - Water", phaseB: "PHASE B - Oil", phaseC: "PHASE C - Actives", phaseD: "PHASE D - Neutralization/Preservation",
+        total: "TOTAL"
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+    const STORAGE_KEY = "formulation_pro_draft";
+
+    // --- STATE ---
+    let state = {
+        meta: { productName: '', productCode: '', docVersion: '1.0', docDate: '', author: '', batchSize: 100 },
+        ingredients: [],
+        processSteps: []
+    };
+
+    // --- RENDER FUNCTIONS ---
+    const renderIngredients = () => {
+        const tbody = $('#formBody');
+        tbody.innerHTML = '';
+        const batchSize = parseFloat(state.meta.batchSize) || 0;
+        const lang = $('#langSel').value;
+
+        const grouped = state.ingredients.reduce((acc, ing) => {
+            const phase = ing.phase.toUpperCase() || '...';
+            if (!acc[phase]) acc[phase] = [];
+            acc[phase].push(ing);
+            return acc;
+        }, {});
+
+        const phaseOrder = ['A', 'B', 'C', 'D'];
+        const sortedPhases = Object.keys(grouped).sort((a, b) => {
+            const indexA = phaseOrder.indexOf(a);
+            const indexB = phaseOrder.indexOf(b);
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            return a.localeCompare(b);
+        });
+
+        for (const phase of sortedPhases) {
+            const phaseHeader = document.createElement('tr');
+            phaseHeader.className = 'phase-header';
+            const phaseCell = document.createElement('td');
+            phaseCell.colSpan = 6;
+            const phaseKey = `phase${phase}`;
+            phaseCell.textContent = I18N[lang][phaseKey] || `PHASE ${phase}`;
+            phaseHeader.appendChild(phaseCell);
+            tbody.appendChild(phaseHeader);
+
+            grouped[phase].forEach(ing => {
+                const tpl = $('#ingredientRowTpl').content.cloneNode(true);
+                const row = tpl.querySelector('tr');
+                row.dataset.id = ing.id;
+                row.querySelector('[data-key="phase"]').value = ing.phase;
+                row.querySelector('[data-key="inci"]').value = ing.inci;
+                row.querySelector('[data-key="tradeName"]').value = ing.tradeName;
+                row.querySelector('[data-key="percent"]').value = ing.percent;
+                row.querySelector('.mass-cell').textContent = (batchSize * ing.percent / 100).toFixed(3);
+                tbody.appendChild(row);
+            });
+        }
+        updateTotals();
+    };
+
+    const renderProcess = () => {
+        const tbody = $('#procBody');
+        tbody.innerHTML = '';
+        state.processSteps.forEach((step, index) => {
+            const tpl = $('#procRowTpl').content.cloneNode(true);
+            const row = tpl.querySelector('tr');
+            row.dataset.id = step.id;
+            row.querySelector('.step-cell').textContent = index + 1;
+            row.querySelector('[data-key="description"]').value = step.description;
+            row.querySelector('[data-key="temp"]').value = step.temp;
+            row.querySelector('[data-key="speed"]').value = step.speed;
+            row.querySelector('[data-key="time"]').value = step.time;
+            tbody.appendChild(row);
+        });
+    };
+
+    const renderAll = () => {
+        renderIngredients();
+        renderProcess();
+    };
+
+    // --- UPDATE & CALCULATION FUNCTIONS ---
+    const updateTotals = () => {
+        const sum = state.ingredients.reduce((acc, ing) => acc + parseFloat(ing.percent || 0), 0);
+        const sumEl = $('#sumPercent');
+        sumEl.textContent = `${sum.toFixed(2)}%`;
+        sumEl.className = Math.abs(sum - 100) < 0.01 ? 'ok' : 'bad';
+    };
+
+    const setLanguage = (lang) => {
+        document.documentElement.lang = lang;
+        $$("[data-i18n]").forEach(el => {
+            const key = el.getAttribute("data-i18n");
+            if (I18N[lang][key]) el.textContent = I18N[lang][key];
+        });
+        renderAll(); // Re-render for language-dependent content like phase headers
+    };
+
+    // --- EVENT HANDLERS ---
+    const handleGenericAdd = (type, defaultData) => {
+        state[type].push({ ...defaultData, id: Date.now() });
+        renderAll();
+    };
+
+    const handleGenericUpdate = (e, type, idKey) => {
+        if (!e.target.classList.contains('data-field')) return;
+        const row = e.target.closest('tr');
+        const id = parseInt(row.dataset.id);
+        const key = e.target.dataset.key;
+        const value = e.target.value;
+        
+        const item = state[type].find(i => i.id === id);
+        if (item) {
+            item[key] = value;
+            if (type === 'ingredients') {
+                renderIngredients(); // Re-render to update mass and totals
+            }
+        }
+    };
+
+    const handleGenericActions = (e, type) => {
+        const row = e.target.closest('tr');
+        if (!row) return;
+        const id = parseInt(row.dataset.id);
+        const index = state[type].findIndex(i => i.id === id);
+
+        if (e.target.classList.contains('delBtn')) {
+            state[type].splice(index, 1);
+        }
+        if (e.target.classList.contains('upBtn') && index > 0) {
+            [state[type][index], state[type][index - 1]] = [state[type][index - 1], state[type][index]];
+        }
+        if (e.target.classList.contains('downBtn') && index < state[type].length - 1) {
+            [state[type][index], state[type][index + 1]] = [state[type][index + 1], state[type][index]];
+        }
+        renderAll();
+    };
+
+    // --- DATA & STORAGE ---
+    const saveState = () => {
+        // Update meta from inputs before saving
+        state.meta.productName = $('#productName').value;
+        state.meta.productCode = $('#productCode').value;
+        state.meta.docVersion = $('#docVersion').value;
+        state.meta.docDate = $('#docDate').value;
+        state.meta.author = $('#author').value;
+        state.meta.batchSize = $('#batchSize').value;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    };
+
+    const loadState = (data) => {
+        state = data;
+        // Populate meta inputs from loaded state
+        $('#productName').value = state.meta.productName;
+        $('#productCode').value = state.meta.productCode;
+        $('#docVersion').value = state.meta.docVersion;
+        $('#docDate').value = state.meta.docDate;
+        $('#author').value = state.meta.author;
+        $('#batchSize').value = state.meta.batchSize;
+        renderAll();
+    };
+
+    // --- INITIALIZATION ---
+    $('#langSel').addEventListener('change', (e) => setLanguage(e.target.value));
+    $('#printBtn').addEventListener('click', () => window.print());
+
+    $('#addIngredientBtn').addEventListener('click', () => handleGenericAdd('ingredients', { phase: 'A', inci: '', tradeName: '', percent: 0 }));
+    $('#addProcBtn').addEventListener('click', () => handleGenericAdd('processSteps', { description: '', temp: '', speed: '', time: '' }));
+
+    $('#formBody').addEventListener('input', (e) => handleGenericUpdate(e, 'ingredients'));
+    $('#procBody').addEventListener('input', (e) => handleGenericUpdate(e, 'processSteps'));
+
+    $('#formBody').addEventListener('click', (e) => handleGenericActions(e, 'ingredients'));
+    $('#procBody').addEventListener('click', (e) => handleGenericActions(e, 'processSteps'));
+
+    $('#saveBtn').addEventListener('click', () => {
+        saveState(); // Ensure latest meta is captured
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${state.meta.productCode || 'formulation'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    $('#loadInput').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const data = JSON.parse(ev.target.result);
+                loadState(data);
+            } catch (err) {
+                alert('Invalid JSON file.');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    });
+
+    // Autosave on any input change
+    document.querySelector('.app').addEventListener('input', saveState);
+
+    // Initial load
+    const savedState = localStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+        loadState(JSON.parse(savedState));
+    } else {
+        // Set today's date by default
+        $('#docDate').valueAsDate = new Date();
+        state.meta.docDate = $('#docDate').value;
+        renderAll();
+    }
+    setLanguage($('#langSel').value);
+});
+</script>
+</body>
+</html>
