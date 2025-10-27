@@ -39,7 +39,6 @@
         .btn:hover { opacity: 0.9; } .btn:active { transform: scale(0.98); }
         .btn.primary { background: var(--primary-btn-bg); } .btn.secondary { background: #95a5a6; } .btn.danger { background: var(--danger); }
         .btn.small { padding: 5px 10px; font-size: .85rem; border-radius: 6px; }
-        /* ИЗМЕНЕНИЕ: Стили для кнопок языка */
         .lang-btn { background: #fff; color: var(--ink); padding: 6px 12px; font-size: 1.2rem; line-height: 1; }
         .lang-btn.active { outline: 2px solid var(--primary-btn-bg); box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
 
@@ -77,19 +76,18 @@
             .print-only { display: table-cell !important; }
             .fill-in { border-bottom: none; }
 
-            /* ИЗМЕНЕНИЕ: Компактная печать карточки изделия */
             .card .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; padding: 0; }
             .card .meta-grid > div { grid-column: auto !important; display: flex; align-items: baseline; border-bottom: 1px dotted #ccc; padding: 2px 0; }
             .card .meta-grid label { font-weight: 600; margin-right: 6px; padding: 0; color: #000; }
             .card .meta-grid label::after { content: ":"; }
 
-            /* ИЗМЕНЕНИЕ: Ширины колонок рецептуры (удалена подпись) */
-            #formTable th:nth-of-type(1), #formTable td:nth-of-type(1) { width: 5%; }
-            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 45%; }
-            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 15%; }
-            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 8%; }
-            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 12%; }
-            #formTable th:nth-of-type(6), #formTable td:nth-of-type(6) { width: 15%; } /* Факт, кг */
+            /* ИЗМЕНЕНИЕ: Скорректирована ширина колонок Рецептуры для печати, чтобы заполнить всю страницу */
+            #formTable th:nth-of-type(1), #formTable td:nth-of-type(1) { width: 5%; }   /* Фаза */
+            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 51%; }  /* Наименование */
+            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 17%; }  /* Аналит. лист */
+            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 7%; }   /* % */
+            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 10%; }  /* Загрузка, кг */
+            #formTable th:nth-of-type(6), #formTable td:nth-of-type(6) { width: 10%; }  /* Факт, кг */
 
             #procTable colgroup, #procTable col { display: none; }
             #procTable th:nth-of-type(1), #procTable td:nth-of-type(1) { width: 5%; }
@@ -99,7 +97,6 @@
             #procTable th:nth-of-type(5), #procTable td:nth-of-type(5) { width: 10%; }
             #procTable .print-only { width: 12%; }
 
-            /* ИЗМЕНЕНИЕ: Ширины колонок ОКК (удалена подпись) */
             .qc-block table th:nth-of-type(1), .qc-block table td:nth-of-type(1) { width: 40%; }
             .qc-block table th:nth-of-type(2), .qc-block table td:nth-of-type(2) { width: 40%; word-break: break-word; }
             .qc-block table th:nth-of-type(3), .qc-block table td:nth-of-type(3) { width: 20%; }
@@ -112,7 +109,6 @@
     <div class="toolbar card no-print">
         <div class="left"><h1 data-i18n="title">Маршрутная карта</h1></div>
         <div class="right">
-            <!-- ИЗМЕНЕНИЕ: Переключатель языка в виде кнопок с флагами -->
             <div class="lang-switcher" style="display: flex; gap: 5px;">
                 <button class="btn lang-btn" id="langRuBtn" title="Русский">🇷🇺</button>
                 <button class="btn lang-btn" id="langEnBtn" title="English">🇬🇧</button>
@@ -154,7 +150,6 @@
                 <th style="width:10%" data-i18n="mass">Загрузка, кг</th>
                 <th style="width:10%" class="no-print" data-i18n="actions">Действия</th>
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
-                <!-- ИЗМЕНЕНИЕ: Удалена колонка "Подпись" -->
             </tr></thead>
             <tbody id="formBody"></tbody>
         </table>
@@ -202,7 +197,6 @@
         <td class="mass-cell" style="text-align: right;">0.000</td>
         <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
         <td class="print-only"><div class="fill-in"></div></td>
-        <!-- ИЗМЕНЕНИЕ: Удалена ячейка для подписи -->
     </tr>
 </template>
 
@@ -240,7 +234,6 @@
                 <th data-i18n="qcParamName">Наименование показателя</th>
                 <th data-i18n="qcStandard">Норматив</th>
                 <th data-i18n="qcResult">Результат</th>
-                <!-- ИЗМЕНЕНИЕ: Удалена колонка "Подпись" -->
                 <th class="no-print" data-i18n="actions">Действия</th>
             </tr></thead>
             <tbody></tbody>
@@ -256,7 +249,6 @@
         <td><input class="data-field" data-key="parameter" data-i18n-placeholder="qcParamPlaceholder"></td>
         <td><input class="data-field" data-key="standard" data-i18n-placeholder="qcStandardPlaceholder"></td>
         <td><div class="fill-in"></div></td>
-        <!-- ИЗМЕНЕНИЕ: Удалена ячейка для подписи -->
         <td class="no-print row-actions"><button class="btn danger small delQcCheckBtn" data-i18n="del">X</button></td>
     </tr>
 </template>
@@ -392,7 +384,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(LANG_KEY, lang);
         document.documentElement.lang = lang;
         
-        // ИЗМЕНЕНИЕ: Обновление активной кнопки языка
         $('#langRuBtn').classList.toggle('active', lang === 'ru');
         $('#langEnBtn').classList.toggle('active', lang === 'en');
 
@@ -456,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 tr.className = 'phase-header';
                 const td = document.createElement('td');
-                td.colSpan = 7; // ИЗМЕНЕНИЕ: Colspan уменьшен до 7
+                td.colSpan = 7;
                 td.textContent = `${i18n('phaseHeader')} ${currentPhase}`;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
@@ -745,7 +736,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // ИЗМЕНЕНИЕ: Обработчики для кнопок языка
         $('#langRuBtn').addEventListener('click', () => setLanguage('ru'));
         $('#langEnBtn').addEventListener('click', () => setLanguage('en'));
 
