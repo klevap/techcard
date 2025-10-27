@@ -247,6 +247,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const $$ = sel => Array.from(document.querySelectorAll(sel));
     const STORAGE_KEY = "routing_map_draft_v3.4";
 
+    // --- HELPER FUNCTIONS (from plan) ---
+    const generateId = () => crypto.randomUUID?.() || String(Date.now() + Math.random());
+
+    const debounce = (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func.apply(this, args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    };
+
+    function normalizeState(data) {
+        const defaults = {
+            meta: { productName: '', productCode: '', docVersion: '1.0', docDate: '', author: '', batchSize: 100 },
+            ingredients: [],
+            processSteps: [],
+            qualityControl: []
+        };
+        const normalized = {
+            meta: { ...defaults.meta, ...(data.meta || {}) },
+            ingredients: Array.isArray(data.ingredients) ? data.ingredients : defaults.ingredients,
+            processSteps: Array.isArray(data.processSteps) ? data.processSteps : defaults.processSteps,
+            qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl
+        };
+        return normalized;
+    }
+
     let state = {
         meta: { productName: '', productCode: '', docVersion: '1.0', docDate: '', author: '', batchSize: 100 },
         ingredients: [],
@@ -263,9 +294,15 @@ document.addEventListener('DOMContentLoaded', () => {
         let lastPhase = null;
         state.ingredients.forEach(ing => {
             const currentPhase = (ing.phase || '').toUpperCase();
+            // FIX 2.1: Safe phase header rendering
             if (currentPhase && currentPhase !== lastPhase) {
-                const phaseHeader = `<tr class="phase-header"><td colspan="8">Фаза ${currentPhase}</td></tr>`;
-                tbody.insertAdjacentHTML('beforeend', phaseHeader);
+                const tr = document.createElement('tr');
+                tr.className = 'phase-header';
+                const td = document.createElement('td');
+                td.colSpan = 8;
+                td.textContent = `Фаза ${currentPhase}`; // Safe
+                tr.appendChild(td);
+                tbody.appendChild(tr);
                 lastPhase = currentPhase;
             }
 
@@ -291,15 +328,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const numParams = step.parameters?.length || 0;
             const rowspan = numParams > 0 ? numParams : 1;
 
-            // Create the main step row
             const stepTpl = $('#procStepRowTpl').content.cloneNode(true);
             const stepRow = stepTpl.querySelector('tr');
             stepRow.dataset.id = step.id;
 
-            // Set content and rowspan for main cells
             const numberCell = stepRow.querySelector('.step-number');
-            numberCell.innerHTML = `<input class="data-field" data-key="number" style="font-weight:bold; text-align:center;" value="${step.number || ''}">`;
             numberCell.setAttribute('rowspan', rowspan);
+            // FIX 2.2: Safe step number input creation
+            const input = document.createElement('input');
+            input.className = 'data-field text-center';
+            input.dataset.key = 'number';
+            input.style.fontWeight = 'bold';
+            input.value = step.number || ''; // Safe
+            numberCell.appendChild(input);
 
             const descCell = stepRow.querySelector('.step-description');
             descCell.querySelector('[data-key="description"]').value = step.description || '';
@@ -311,9 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
             equipCell.querySelector('[data-key="equipment-print"]').textContent = step.equipment || '';
             equipCell.setAttribute('rowspan', rowspan);
 
-            // Handle parameters
             if (numParams > 0) {
-                // Add first parameter to the main row
                 const firstParam = step.parameters[0];
                 const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
                 const paramCells = Array.from(paramTpl.querySelector('tr').children);
@@ -322,10 +361,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 paramCells[1].querySelector('input').value = firstParam.norm || '';
                 paramCells[1].querySelector('input').dataset.paramId = firstParam.id;
                 paramCells[2].querySelector('button').dataset.paramId = firstParam.id;
+                
+                // FIX 1: Add control buttons to the first parameter's action cell
+                const actionsTd = paramCells[2]; 
+                actionsTd.style.whiteSpace = 'nowrap';
+
+                const addBtn = document.createElement('button');
+                addBtn.className = 'btn primary small addParamBtn';
+                addBtn.textContent = '➕ Параметр';
+                actionsTd.appendChild(addBtn);
+
+                const delStepBtn = document.createElement('button');
+                delStepBtn.className = 'btn danger small delBtn';
+                delStepBtn.textContent = 'Удалить шаг';
+                actionsTd.appendChild(delStepBtn);
+
                 stepRow.append(...paramCells);
                 tbody.appendChild(stepRow);
 
-                // Add subsequent parameter rows
                 for (let i = 1; i < numParams; i++) {
                     const param = step.parameters[i];
                     const subsequentParamTpl = $('#procParamRowTpl').content.cloneNode(true);
@@ -339,7 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     tbody.appendChild(subsequentParamRow);
                 }
             } else {
-                // If no parameters, add empty cells and action buttons
+                // If no parameters, add empty cells and action buttons (now only add param and delete step)
                 const emptyCells = `
                     <td></td><td></td>
                     <td class="no-print row-actions">
@@ -400,6 +453,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     };
+    
+    // FIX 5: Create debounced version of saveState
+    const debouncedSave = debounce(saveState, 400);
 
     const loadState = (data) => {
         state = data;
@@ -415,7 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = e.target.dataset.key;
         const value = e.target.value;
 
-        // Ingredient update
         const ingRow = e.target.closest('tr[data-id]:not([data-param-id])');
         if (ingRow && $('#formBody').contains(ingRow)) {
             const item = state.ingredients.find(i => i.id == ingRow.dataset.id);
@@ -429,13 +484,27 @@ document.addEventListener('DOMContentLoaded', () => {
                     ingRow.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(value) || 0) / 100).toFixed(3);
                     updateTotals();
                 }
+                // FIX 6: Handle focus loss on phase change
                 if (key === 'phase') {
-                    setTimeout(renderIngredients, 300);
+                    const activeEl = document.activeElement;
+                    const rowId = activeEl.closest('tr')?.dataset.id;
+                    const keyName = activeEl.dataset.key;
+                    const selectionStart = activeEl.selectionStart;
+
+                    state.ingredients.sort((a, b) => (a.phase || '').localeCompare(b.phase || ''));
+                    renderIngredients();
+
+                    if (rowId && keyName) {
+                        const newEl = document.querySelector(`tr[data-id="${rowId}"] [data-key="${keyName}"]`);
+                        if (newEl) {
+                            newEl.focus();
+                            newEl.setSelectionRange(selectionStart, selectionStart);
+                        }
+                    }
                 }
             }
         }
 
-        // Process step or parameter update
         const procRow = e.target.closest('tr[data-id]');
         if (procRow && $('#procBody').contains(procRow)) {
             const step = state.processSteps.find(s => s.id == procRow.dataset.id);
@@ -453,7 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // QC update
         const qcBlock = e.target.closest('.qc-block[data-id]');
         if (qcBlock) {
             const block = state.qualityControl.find(b => b.id == qcBlock.dataset.id);
@@ -467,14 +535,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        saveState();
+        // Removed saveState() from here, it's now called by the debounced listener
     };
 
     // --- EVENT LISTENERS ---
     function initialize() {
         $('#printBtn').addEventListener('click', () => window.print());
         $('#saveBtn').addEventListener('click', () => {
-            saveState();
+            saveState(); // Immediate save on button click
             const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
@@ -485,12 +553,13 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#loadInput').addEventListener('change', (e) => {
             const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
+            // FIX 4: Use normalizer on file load
             reader.onload = (ev) => {
                 try {
                     const loaded = JSON.parse(ev.target.result);
-                    if (loaded.meta && loaded.ingredients && loaded.processSteps) {
-                        loadState(loaded); alert('Данные успешно загружены!');
-                    } else { throw new Error("Неверная структура файла"); }
+                    const validatedState = normalizeState(loaded);
+                    loadState(validatedState); 
+                    alert('Данные успешно загружены!');
                 } catch (err) { alert('Ошибка чтения файла: ' + err.message); }
             };
             reader.readAsText(file); e.target.value = '';
@@ -498,42 +567,40 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Add buttons
         $('#addIngredientBtn').addEventListener('click', () => {
-            state.ingredients.push({ id: Date.now(), phase: '', tradeName: '', percent: 0 });
-            renderIngredients(); saveState();
+            // FIX 3: Use generateId
+            state.ingredients.push({ id: generateId(), phase: '', tradeName: '', percent: 0 });
+            renderIngredients(); debouncedSave();
         });
         $('#addProcBtn').addEventListener('click', () => {
-            state.processSteps.push({ id: Date.now(), number: '', description: '', equipment: '', parameters: [] });
-            renderProcess(); saveState();
+            state.processSteps.push({ id: generateId(), number: '', description: '', equipment: '', parameters: [] });
+            renderProcess(); debouncedSave();
         });
         $('#addQcBtn').addEventListener('click', () => {
-            state.qualityControl.push({ id: Date.now(), name: 'Новый блок контроля', checks: [] });
-            renderQc(); saveState();
+            state.qualityControl.push({ id: generateId(), name: 'Новый блок контроля', checks: [] });
+            renderQc(); debouncedSave();
         });
 
         // Dynamic content clicks
         document.body.addEventListener('click', (e) => {
             let needsSave = false;
-            // Add parameter to process step
             if (e.target.classList.contains('addParamBtn')) {
                 const stepId = e.target.closest('tr').dataset.id;
                 const step = state.processSteps.find(s => s.id == stepId);
                 if (step) {
                     if (!step.parameters) step.parameters = [];
-                    step.parameters.push({ id: Date.now(), name: '', norm: '' });
+                    step.parameters.push({ id: generateId(), name: '', norm: '' });
                     renderProcess(); needsSave = true;
                 }
             }
-            // Add check to QC block
             if (e.target.classList.contains('addQcCheckBtn')) {
                 const blockId = e.target.closest('.qc-block').dataset.id;
                 const block = state.qualityControl.find(b => b.id == blockId);
                 if (block) {
                     if (!block.checks) block.checks = [];
-                    block.checks.push({ id: Date.now(), parameter: '', standard: '' });
+                    block.checks.push({ id: generateId(), parameter: '', standard: '' });
                     renderQc(); needsSave = true;
                 }
             }
-            // Deletions
             if (e.target.classList.contains('delBtn')) {
                 if (!confirm('Вы уверены?')) return;
                 const ingRow = e.target.closest('tr[data-id]');
@@ -573,21 +640,28 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderQc(); needsSave = true;
                 }
             }
-            if (needsSave) saveState();
+            if (needsSave) debouncedSave();
         });
 
         // Inputs
-        document.body.addEventListener('input', handleUpdate);
+        // FIX 5: Use debounced save on input
+        document.body.addEventListener('input', (e) => {
+            handleUpdate(e);
+            debouncedSave();
+        });
         $('#batchSize').addEventListener('input', (e) => {
             state.meta.batchSize = e.target.value;
-            saveState();
+            // debouncedSave() will be called by the main input listener, but re-rendering ingredients is immediate
             renderIngredients();
         });
 
         // Initial load
         const savedState = localStorage.getItem(STORAGE_KEY);
         if (savedState) {
-            try { loadState(JSON.parse(savedState)); } 
+            try { 
+                // Use normalizer on local storage data as well for robustness
+                loadState(normalizeState(JSON.parse(savedState))); 
+            } 
             catch (e) { console.error('Ошибка загрузки из localStorage:', e); }
         } else {
             $('#docDate').valueAsDate = new Date();
