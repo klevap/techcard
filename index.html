@@ -69,11 +69,21 @@
             table { page-break-inside: auto; table-layout: fixed; } /* Use fixed layout for print */
             tr { page-break-inside: avoid; page-break-after: auto; }
             th, td { padding: 4px; border: 1px solid #aaa; vertical-align: middle; word-wrap: break-word; }
-            th, .phase-header td, .step-header td { background-color: #e0e0e0 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
+            /* ИСПРАВЛЕНИЕ 2: Убран .step-header td из этого правила, чтобы убрать серый фон у ячеек шага процесса */
+            th, .phase-header td { background-color: #e0e0e0 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
             .print-only { display: table-cell !important; }
             .fill-in { border-bottom: none; }
 
             /* --- Print-specific column widths --- */
+            /* ИСПРАВЛЕНИЕ 1: Добавлены явные ширины для таблицы Рецептуры */
+            #formTable th:nth-of-type(1), #formTable td:nth-of-type(1) { width: 5%; }   /* Фаза */
+            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 40%; }  /* Наименование */
+            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 10%; }  /* Аналит. лист */
+            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 5%; }   /* % */
+            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 10%; }  /* Загрузка, кг */
+            #formTable th:nth-of-type(7), #formTable td:nth-of-type(7) { width: 15%; }  /* Факт, кг (print-only) */
+            #formTable th:nth-of-type(8), #formTable td:nth-of-type(8) { width: 15%; }  /* Подпись (print-only) */
+
             #procTable colgroup, #procTable col { display: none; } /* Ignore inline widths for print */
             #procTable th:nth-of-type(1), #procTable td:nth-of-type(1) { width: 5%; } /* № */
             #procTable th:nth-of-type(2), #procTable td:nth-of-type(2) { width: 30%; } /* Описание */
