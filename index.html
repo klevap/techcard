@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Маршрутная карта v3.5</title>
+    <title data-i18n="pageTitle">Маршрутная карта v3.6</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -26,27 +26,23 @@
             background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font-size: .95rem; width: 100%; box-sizing: border-box;
         }
         input:focus, select:focus, textarea:focus { outline: 2px solid #3498db; border-color: transparent; }
-        /* ИЗМЕНЕНИЕ: Стили для авто-расширения textarea */
         textarea { resize: none; overflow-y: hidden; min-height: 40px; }
         .grid { display: grid; gap: 16px; }
-        /* ИЗМЕНЕНИЕ: Новая сетка для карточки изделия для управления размерами полей */
-        .meta-grid {
-            grid-template-columns: repeat(6, 1fr);
-        }
+        .meta-grid { grid-template-columns: repeat(6, 1fr); }
         .meta-grid .grid-span-2 { grid-column: span 2; }
         .meta-grid .grid-span-3 { grid-column: span 3; }
-        @media (max-width: 900px) {
-            .meta-grid .grid-span-2, .meta-grid .grid-span-3 { grid-column: span 6; }
-        }
-        @media (max-width: 1200px) and (min-width: 901px) {
-            .meta-grid .grid-span-3 { grid-column: span 6; }
-        }
+        @media (max-width: 900px) { .meta-grid .grid-span-2, .meta-grid .grid-span-3 { grid-column: span 6; } }
+        @media (max-width: 1200px) and (min-width: 901px) { .meta-grid .grid-span-3 { grid-column: span 6; } }
 
         .ok { color: var(--accent); } .bad { color: var(--danger); }
         .btn { cursor: pointer; transition: all .1s ease; user-select: none; border: none; color: #fff; width: auto; }
         .btn:hover { opacity: 0.9; } .btn:active { transform: scale(0.98); }
         .btn.primary { background: var(--primary-btn-bg); } .btn.secondary { background: #95a5a6; } .btn.danger { background: var(--danger); }
         .btn.small { padding: 5px 10px; font-size: .85rem; border-radius: 6px; }
+        /* ИЗМЕНЕНИЕ: Стили для кнопок языка */
+        .lang-btn { background: #fff; color: var(--ink); padding: 6px 12px; font-size: 1.2rem; line-height: 1; }
+        .lang-btn.active { outline: 2px solid var(--primary-btn-bg); box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
+
         .row-actions { display: flex; gap: 6px; align-items: center; justify-content: center; }
         table { width: 100%; border-collapse: collapse; }
         th, td { border: 1px solid var(--line); padding: 8px; vertical-align: top; text-align: left; }
@@ -80,13 +76,21 @@
             th, .phase-header td { background-color: #e0e0e0 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
             .print-only { display: table-cell !important; }
             .fill-in { border-bottom: none; }
+
+            /* ИЗМЕНЕНИЕ: Компактная печать карточки изделия */
+            .card .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; padding: 0; }
+            .card .meta-grid > div { grid-column: auto !important; display: flex; align-items: baseline; border-bottom: 1px dotted #ccc; padding: 2px 0; }
+            .card .meta-grid label { font-weight: 600; margin-right: 6px; padding: 0; color: #000; }
+            .card .meta-grid label::after { content: ":"; }
+
+            /* ИЗМЕНЕНИЕ: Ширины колонок рецептуры (удалена подпись) */
             #formTable th:nth-of-type(1), #formTable td:nth-of-type(1) { width: 5%; }
-            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 40%; }
-            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 10%; }
-            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 5%; }
-            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 10%; }
-            #formTable th:nth-of-type(7), #formTable td:nth-of-type(7) { width: 15%; }
-            #formTable th:nth-of-type(8), #formTable td:nth-of-type(8) { width: 15%; }
+            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 45%; }
+            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 15%; }
+            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 8%; }
+            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 12%; }
+            #formTable th:nth-of-type(6), #formTable td:nth-of-type(6) { width: 15%; } /* Факт, кг */
+
             #procTable colgroup, #procTable col { display: none; }
             #procTable th:nth-of-type(1), #procTable td:nth-of-type(1) { width: 5%; }
             #procTable th:nth-of-type(2), #procTable td:nth-of-type(2) { width: 30%; }
@@ -94,10 +98,11 @@
             #procTable th:nth-of-type(4), #procTable td:nth-of-type(4) { width: 25%; }
             #procTable th:nth-of-type(5), #procTable td:nth-of-type(5) { width: 10%; }
             #procTable .print-only { width: 12%; }
-            .qc-block table th:nth-of-type(1), .qc-block table td:nth-of-type(1) { width: 30%; }
-            .qc-block table th:nth-of-type(2), .qc-block table td:nth-of-type(2) { width: 30%; word-break: break-word; }
+
+            /* ИЗМЕНЕНИЕ: Ширины колонок ОКК (удалена подпись) */
+            .qc-block table th:nth-of-type(1), .qc-block table td:nth-of-type(1) { width: 40%; }
+            .qc-block table th:nth-of-type(2), .qc-block table td:nth-of-type(2) { width: 40%; word-break: break-word; }
             .qc-block table th:nth-of-type(3), .qc-block table td:nth-of-type(3) { width: 20%; }
-            .qc-block table th:nth-of-type(4), .qc-block table td:nth-of-type(4) { width: 20%; }
         }
     </style>
 </head>
@@ -107,11 +112,11 @@
     <div class="toolbar card no-print">
         <div class="left"><h1 data-i18n="title">Маршрутная карта</h1></div>
         <div class="right">
-            <!-- ИЗМЕНЕНИЕ: Добавлен выбор языка и кнопка очистки -->
-            <select id="langSelector" style="width: auto;">
-                <option value="ru">Русский</option>
-                <option value="en">English</option>
-            </select>
+            <!-- ИЗМЕНЕНИЕ: Переключатель языка в виде кнопок с флагами -->
+            <div class="lang-switcher" style="display: flex; gap: 5px;">
+                <button class="btn lang-btn" id="langRuBtn" title="Русский">🇷🇺</button>
+                <button class="btn lang-btn" id="langEnBtn" title="English">🇬🇧</button>
+            </div>
             <button class="btn primary" id="printBtn" data-i18n="print">🖨️ Печать / PDF</button>
             <button class="btn secondary" id="saveBtn" data-i18n="save">💾 Сохранить JSON</button>
             <label class="btn secondary" for="loadInput" data-i18n="load">📁 Загрузить JSON</label>
@@ -123,7 +128,6 @@
     <!-- META INFO -->
     <div class="card">
         <h2 data-i18n="meta">Карточка изделия</h2>
-        <!-- ИЗМЕНЕНИЕ: Сетка изменена для управления размерами полей -->
         <div class="grid meta-grid">
             <div class="grid-span-3"><label data-i18n="productName">Наименование продукта</label><input id="productName" /></div>
             <div class="grid-span-2"><label data-i18n="productCode">Код / Артикул</label><input id="productCode" /></div>
@@ -150,7 +154,7 @@
                 <th style="width:10%" data-i18n="mass">Загрузка, кг</th>
                 <th style="width:10%" class="no-print" data-i18n="actions">Действия</th>
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
-                <th class="print-only" data-i18n="signature">Подпись</th>
+                <!-- ИЗМЕНЕНИЕ: Удалена колонка "Подпись" -->
             </tr></thead>
             <tbody id="formBody"></tbody>
         </table>
@@ -198,7 +202,7 @@
         <td class="mass-cell" style="text-align: right;">0.000</td>
         <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
         <td class="print-only"><div class="fill-in"></div></td>
-        <td class="print-only"><div class="fill-in"></div></td>
+        <!-- ИЗМЕНЕНИЕ: Удалена ячейка для подписи -->
     </tr>
 </template>
 
@@ -236,7 +240,7 @@
                 <th data-i18n="qcParamName">Наименование показателя</th>
                 <th data-i18n="qcStandard">Норматив</th>
                 <th data-i18n="qcResult">Результат</th>
-                <th data-i18n="signature">Подпись</th>
+                <!-- ИЗМЕНЕНИЕ: Удалена колонка "Подпись" -->
                 <th class="no-print" data-i18n="actions">Действия</th>
             </tr></thead>
             <tbody></tbody>
@@ -252,7 +256,7 @@
         <td><input class="data-field" data-key="parameter" data-i18n-placeholder="qcParamPlaceholder"></td>
         <td><input class="data-field" data-key="standard" data-i18n-placeholder="qcStandardPlaceholder"></td>
         <td><div class="fill-in"></div></td>
-        <td><div class="fill-in"></div></td>
+        <!-- ИЗМЕНЕНИЕ: Удалена ячейка для подписи -->
         <td class="no-print row-actions"><button class="btn danger small delQcCheckBtn" data-i18n="del">X</button></td>
     </tr>
 </template>
@@ -261,13 +265,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "routing_map_draft_v3.5";
+    const STORAGE_KEY = "routing_map_draft_v3.6";
     const LANG_KEY = "routing_map_lang";
 
     // --- I18N - INTERNATIONALIZATION ---
     const translations = {
         ru: {
-            pageTitle: "Маршрутная карта v3.5",
+            pageTitle: "Маршрутная карта v3.6",
             title: "Маршрутная карта",
             print: "🖨️ Печать / PDF",
             save: "💾 Сохранить JSON",
@@ -289,7 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mass: "Загрузка, кг",
             actions: "Действия",
             actualMass: "Факт, кг",
-            signature: "Подпись",
             addIngredient: "➕ Добавить ингредиент",
             process: "Технологический процесс",
             step: "№",
@@ -312,7 +315,6 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmDelete: "Вы уверены?",
             confirmClear: "Вы уверены, что хотите полностью очистить форму? Все несохраненные данные будут потеряны.",
             confirmDeleteBlock: "Удалить весь блок контроля?",
-            // Placeholders
             phasePlaceholder: "A",
             tradeNamePlaceholder: "Вода очищенная",
             paramNamePlaceholder: "Температура, °C",
@@ -325,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
             qcStandardPlaceholder: "Однородная масса",
         },
         en: {
-            pageTitle: "Manufacturing Route Card v3.5",
+            pageTitle: "Manufacturing Route Card v3.6",
             title: "Manufacturing Route Card",
             print: "🖨️ Print / PDF",
             save: "💾 Save JSON",
@@ -347,7 +349,6 @@ document.addEventListener('DOMContentLoaded', () => {
             mass: "Load, kg",
             actions: "Actions",
             actualMass: "Actual, kg",
-            signature: "Signature",
             addIngredient: "➕ Add Ingredient",
             process: "Technological Process",
             step: "#",
@@ -370,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
             confirmDelete: "Are you sure?",
             confirmClear: "Are you sure you want to clear the entire form? All unsaved data will be lost.",
             confirmDeleteBlock: "Delete the entire control block?",
-            // Placeholders
             phasePlaceholder: "A",
             tradeNamePlaceholder: "Purified water",
             paramNamePlaceholder: "Temperature, °C",
@@ -391,6 +391,11 @@ document.addEventListener('DOMContentLoaded', () => {
         currentLang = lang;
         localStorage.setItem(LANG_KEY, lang);
         document.documentElement.lang = lang;
+        
+        // ИЗМЕНЕНИЕ: Обновление активной кнопки языка
+        $('#langRuBtn').classList.toggle('active', lang === 'ru');
+        $('#langEnBtn').classList.toggle('active', lang === 'en');
+
         $$('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
             el.textContent = i18n(key);
@@ -399,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = el.dataset.i18nPlaceholder;
             el.placeholder = i18n(key);
         });
-        renderAll(); // Re-render to update dynamic content like phase headers
+        renderAll();
     };
 
     // --- HELPER FUNCTIONS ---
@@ -413,7 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
     
-    // ИЗМЕНЕНИЕ: Функция для авто-расширения textarea
     const autoExpand = (textarea) => {
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
@@ -452,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 tr.className = 'phase-header';
                 const td = document.createElement('td');
-                td.colSpan = 8;
+                td.colSpan = 7; // ИЗМЕНЕНИЕ: Colspan уменьшен до 7
                 td.textContent = `${i18n('phaseHeader')} ${currentPhase}`;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
@@ -578,11 +582,9 @@ document.addEventListener('DOMContentLoaded', () => {
             blockEl.querySelector('.delQcBtn').textContent = i18n('delBlock');
             blockEl.querySelector('.addQcCheckBtn').textContent = `➕ ${i18n('addQcCheck')}`;
             
-            // Translate headers in template clone
             blockEl.querySelector('[data-i18n="qcParamName"]').textContent = i18n('qcParamName');
             blockEl.querySelector('[data-i18n="qcStandard"]').textContent = i18n('qcStandard');
             blockEl.querySelector('[data-i18n="qcResult"]').textContent = i18n('qcResult');
-            blockEl.querySelector('[data-i18n="signature"]').textContent = i18n('signature');
             blockEl.querySelector('[data-i18n="actions"]').textContent = i18n('actions');
 
             const tbody = blockEl.querySelector('tbody');
@@ -607,7 +609,6 @@ document.addEventListener('DOMContentLoaded', () => {
         renderIngredients();
         renderProcess();
         renderQc();
-        // ИЗМЕНЕНИЕ: Применяем авто-расширение ко всем textarea после рендера
         $$('textarea').forEach(autoExpand);
     };
 
@@ -737,7 +738,6 @@ document.addEventListener('DOMContentLoaded', () => {
             reader.readAsText(file); e.target.value = '';
         });
         
-        // ИЗМЕНЕНИЕ: Обработчик для кнопки очистки
         $('#clearBtn').addEventListener('click', () => {
             if (confirm(i18n('confirmClear'))) {
                 localStorage.removeItem(STORAGE_KEY);
@@ -745,10 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // ИЗМЕНЕНИЕ: Обработчик для выбора языка
-        $('#langSelector').addEventListener('change', (e) => setLanguage(e.target.value));
+        // ИЗМЕНЕНИЕ: Обработчики для кнопок языка
+        $('#langRuBtn').addEventListener('click', () => setLanguage('ru'));
+        $('#langEnBtn').addEventListener('click', () => setLanguage('en'));
 
-        // Add buttons
         $('#addIngredientBtn').addEventListener('click', () => {
             state.ingredients.push({ id: generateId(), phase: '', tradeName: '', percent: 0 });
             renderIngredients(); debouncedSave();
@@ -762,7 +762,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderQc(); debouncedSave();
         });
 
-        // Dynamic content clicks
         document.body.addEventListener('click', (e) => {
             let needsSave = false;
             if (e.target.classList.contains('addParamBtn')) {
@@ -825,10 +824,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (needsSave) debouncedSave();
         });
 
-        // Inputs
         document.body.addEventListener('input', (e) => {
             handleUpdate(e);
-            // ИЗМЕНЕНИЕ: Вызов авто-расширения при вводе в textarea
             if (e.target.tagName.toLowerCase() === 'textarea') {
                 autoExpand(e.target);
             }
@@ -840,7 +837,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Initial load
-        $('#langSelector').value = currentLang;
         const savedState = localStorage.getItem(STORAGE_KEY);
         if (savedState) {
             try { 
@@ -850,7 +846,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             $('#docDate').value = new Date().toISOString().slice(0,10);
         }
-        setLanguage(currentLang); // Apply language on initial load
+        setLanguage(currentLang);
     }
 
     initialize();
