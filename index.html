@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Маршрутная карта v3.6</title>
+    <title data-i18n="pageTitle">Маршрутная карта v4.0</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -29,6 +29,7 @@
         textarea { resize: none; overflow-y: hidden; min-height: 40px; }
         .grid { display: grid; gap: 16px; }
         .meta-grid { grid-template-columns: repeat(6, 1fr); }
+        .meta-grid .grid-span-full { grid-column: 1 / -1; }
         .meta-grid .grid-span-2 { grid-column: span 2; }
         .meta-grid .grid-span-3 { grid-column: span 3; }
         @media (max-width: 900px) { .meta-grid .grid-span-2, .meta-grid .grid-span-3 { grid-column: span 6; } }
@@ -58,9 +59,12 @@
         .print-only { display: none; }
         .fill-in { min-height: 1.3em; }
         .print-content { display: none; }
+        .print-options { background: var(--header-bg); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
+        .print-options-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; align-items: center; }
+        .print-options-grid label { margin: 0; font-weight: normal; color: var(--ink); }
 
         @media print {
-            body { background: #fff; color: #000; font-size: 12px; line-height: 1.3; }
+            body { background: #fff; color: #000; font-size: 10px; line-height: 1.3; }
             .app { max-width: 100%; margin: 0; padding: 10px; box-shadow: none; }
             .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; padding: 10px; border-radius: 0; }
             .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
@@ -80,26 +84,15 @@
             .card .meta-grid > div { grid-column: auto !important; display: flex; align-items: baseline; border-bottom: 1px dotted #ccc; padding: 2px 0; }
             .card .meta-grid label { font-weight: 600; margin-right: 6px; padding: 0; color: #000; }
             .card .meta-grid label::after { content: ":"; }
-
-            /* ИЗМЕНЕНИЕ: Скорректирована ширина колонок Рецептуры для печати, чтобы заполнить всю страницу */
-            #formTable th:nth-of-type(1), #formTable td:nth-of-type(1) { width: 5%; }   /* Фаза */
-            #formTable th:nth-of-type(2), #formTable td:nth-of-type(2) { width: 51%; }  /* Наименование */
-            #formTable th:nth-of-type(3), #formTable td:nth-of-type(3) { width: 17%; }  /* Аналит. лист */
-            #formTable th:nth-of-type(4), #formTable td:nth-of-type(4) { width: 7%; }   /* % */
-            #formTable th:nth-of-type(5), #formTable td:nth-of-type(5) { width: 10%; }  /* Загрузка, кг */
-            #formTable th:nth-of-type(6), #formTable td:nth-of-type(6) { width: 10%; }  /* Факт, кг */
-
-            #procTable colgroup, #procTable col { display: none; }
-            #procTable th:nth-of-type(1), #procTable td:nth-of-type(1) { width: 5%; }
-            #procTable th:nth-of-type(2), #procTable td:nth-of-type(2) { width: 30%; }
-            #procTable th:nth-of-type(3), #procTable td:nth-of-type(3) { width: 18%; }
-            #procTable th:nth-of-type(4), #procTable td:nth-of-type(4) { width: 25%; }
-            #procTable th:nth-of-type(5), #procTable td:nth-of-type(5) { width: 10%; }
-            #procTable .print-only { width: 12%; }
-
-            .qc-block table th:nth-of-type(1), .qc-block table td:nth-of-type(1) { width: 40%; }
-            .qc-block table th:nth-of-type(2), .qc-block table td:nth-of-type(2) { width: 40%; word-break: break-word; }
-            .qc-block table th:nth-of-type(3), .qc-block table td:nth-of-type(3) { width: 20%; }
+            
+            body.print-hide-description .description-card,
+            body.print-hide-performance .performance-card,
+            body.print-hide-stability .stability-card,
+            body.print-hide-supplier .supplier-col,
+            body.print-hide-notes .notes-col { display: none; }
+            
+            body.print-name-trade .inci-col,
+            body.print-name-inci .trade-col { display: none; }
         }
     </style>
 </head>
@@ -121,6 +114,33 @@
         </div>
     </div>
 
+    <!-- PRINT OPTIONS -->
+    <div class="card no-print">
+        <h2 data-i18n="printOptions">Опции печати</h2>
+        <div class="print-options">
+            <div>
+                <label data-i18n="printNamePriority">Основное наименование в рецептуре:</label>
+                <select id="printNameSelect">
+                    <option value="trade" data-i18n="printTradeName">Торговое название</option>
+                    <option value="inci" data-i18n="printInciName">INCI</option>
+                </select>
+            </div>
+            <div class="print-options-grid">
+                <label data-i18n="printShowBlocks">Показывать блоки:</label>
+                <div>
+                    <input type="checkbox" id="printShowDescription" checked><label for="printShowDescription" data-i18n="printDescription">Описание</label>
+                    <input type="checkbox" id="printShowPerformance" checked style="margin-left: 15px;"><label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
+                    <input type="checkbox" id="printShowStability" checked style="margin-left: 15px;"><label for="printShowStability" data-i18n="printStability">Стабильность</label>
+                </div>
+                <label data-i18n="printShowColumns">Показывать колонки:</label>
+                <div>
+                    <input type="checkbox" id="printShowSupplier" checked><label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
+                    <input type="checkbox" id="printShowNotes" checked style="margin-left: 15px;"><label for="printShowNotes" data-i18n="printNotes">Примечания</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- META INFO -->
     <div class="card">
         <h2 data-i18n="meta">Карточка изделия</h2>
@@ -131,6 +151,11 @@
             <div class="grid-span-3"><label data-i18n="author">Технолог</label><input id="author" /></div>
             <div class="grid-span-2"><label data-i18n="date">Дата документа</label><input id="docDate" type="date" /></div>
             <div><label data-i18n="batchSize">Размер партии (кг)</label><input id="batchSize" type="number" min="0" step="0.01" value="100" /></div>
+            <div class="grid-span-full description-card">
+                <label data-i18n="description">Описание продукта</label>
+                <textarea id="description" rows="2"></textarea>
+                <div class="print-content" id="description-print"></div>
+            </div>
         </div>
     </div>
 
@@ -144,16 +169,46 @@
         <table id="formTable">
             <thead><tr>
                 <th style="width:5%" data-i18n="phase">Фаза</th>
-                <th style="width:35%" data-i18n="trade">Наименование</th>
-                <th style="width:10%" data-i18n="analysisSheet">Аналит. лист</th>
+                <th class="trade-col" style="width:25%" data-i18n="tradeName">Торг. название</th>
+                <th class="inci-col" style="width:25%" data-i18n="inciName">INCI</th>
+                <th class="supplier-col" style="width:10%" data-i18n="supplier">Поставщик</th>
+                <th class="notes-col" style="width:10%" data-i18n="notes">Примечания</th>
                 <th style="width:6%" data-i18n="percent">%</th>
-                <th style="width:10%" data-i18n="mass">Загрузка, кг</th>
-                <th style="width:10%" class="no-print" data-i18n="actions">Действия</th>
+                <th style="width:8%" data-i18n="mass">Загрузка, кг</th>
+                <th style="width:11%" class="no-print" data-i18n="actions">Действия</th>
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
             </tr></thead>
             <tbody id="formBody"></tbody>
         </table>
         <div class="section-actions no-print"><button class="btn primary small" id="addIngredientBtn" data-i18n="addIngredient">➕ Добавить ингредиент</button></div>
+    </div>
+
+    <!-- PERFORMANCE DATA -->
+    <div class="card performance-card">
+        <h2 data-i18n="performance">Данные об эффективности</h2>
+        <table id="perfTable">
+            <thead><tr>
+                <th style="width:40%" data-i18n="perfParam">Параметр</th>
+                <th style="width:40%" data-i18n="perfValue">Значение</th>
+                <th style="width:20%" class="no-print" data-i18n="actions">Действия</th>
+            </tr></thead>
+            <tbody id="perfBody"></tbody>
+        </table>
+        <div class="section-actions no-print"><button class="btn primary small" id="addPerfBtn" data-i18n="addPerf">➕ Добавить параметр</button></div>
+    </div>
+
+    <!-- STABILITY DATA -->
+    <div class="card stability-card">
+        <h2 data-i18n="stability">Данные о стабильности</h2>
+        <table id="stabTable">
+            <thead><tr>
+                <th style="width:40%" data-i18n="stabCondition">Условие</th>
+                <th style="width:40%" data-i18n="stabResult">Результат</th>
+                <th style="width:20%" class="no-print" data-i18n="actions">Действия</th>
+            </tr></thead>
+            <tbody id="stabBody"></tbody>
+        </table>
+        <div class="section-actions no-print"><button class="btn primary small" id="addStabBtn" data-i18n="addStab">➕ Добавить тест</button></div>
     </div>
 
     <!-- PROCESS TABLE -->
@@ -162,7 +217,7 @@
         <table id="procTable">
             <thead><tr>
                 <th style="width:5%" data-i18n="step">№</th>
-                <th style="width:30%" data-i18n="description">Описание операции</th>
+                <th style="width:30%" data-i18n="opDescription">Описание операции</th>
                 <th style="width:20%" data-i18n="equipment">Оборудование</th>
                 <th style="width:20%" data-i18n="paramName">Параметр процесса</th>
                 <th style="width:10%" data-i18n="norm">Норма</th>
@@ -187,16 +242,37 @@
 <!-- TEMPLATES -->
 <template id="ingredientRowTpl">
     <tr>
-        <td class="text-center"><input class="data-field text-center" data-key="phase" data-i18n-placeholder="phasePlaceholder" maxlength="5"></td>
-        <td>
-            <textarea class="data-field" data-key="tradeName" data-i18n-placeholder="tradeNamePlaceholder" rows="1"></textarea>
+        <td><input class="data-field text-center" data-key="phase" maxlength="5"></td>
+        <td class="trade-col">
+            <textarea class="data-field" data-key="tradeName" rows="1"></textarea>
             <div class="print-content" data-key="tradeName-print"></div>
         </td>
-        <td><input class="data-field" data-key="analysisSheet" placeholder=""></td>
-        <td class="text-center"><input class="data-field text-center" data-key="percent" type="number" min="0" max="100" step="0.01" value="0"></td>
+        <td class="inci-col">
+            <textarea class="data-field" data-key="inciName" rows="1"></textarea>
+            <div class="print-content" data-key="inciName-print"></div>
+        </td>
+        <td class="supplier-col"><input class="data-field" data-key="supplier"></td>
+        <td class="notes-col"><input class="data-field" data-key="notes"></td>
+        <td><input class="data-field text-center" data-key="percent" type="number" min="0" max="100" step="0.01" value="0"></td>
         <td class="mass-cell" style="text-align: right;">0.000</td>
         <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
         <td class="print-only"><div class="fill-in"></div></td>
+    </tr>
+</template>
+
+<template id="perfRowTpl">
+    <tr>
+        <td><input class="data-field" data-key="parameter"></td>
+        <td><input class="data-field" data-key="value"></td>
+        <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
+    </tr>
+</template>
+
+<template id="stabRowTpl">
+    <tr>
+        <td><input class="data-field" data-key="condition"></td>
+        <td><input class="data-field" data-key="result"></td>
+        <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
     </tr>
 </template>
 
@@ -216,8 +292,8 @@
 
 <template id="procParamRowTpl">
     <tr class="param-row">
-        <td><input class="data-field" data-key="name" data-i18n-placeholder="paramNamePlaceholder"></td>
-        <td><input class="data-field" data-key="norm" data-i18n-placeholder="normPlaceholder"></td>
+        <td><input class="data-field" data-key="name"></td>
+        <td><input class="data-field" data-key="norm"></td>
         <td class="no-print row-actions"><button class="btn danger small delParamBtn" data-i18n="del">X</button></td>
         <td class="print-only"><div class="fill-in"></div></td>
     </tr>
@@ -226,7 +302,7 @@
 <template id="qcBlockTpl">
     <div class="qc-block" style="margin-bottom: 20px;">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-            <input class="data-field" data-key="name" data-i18n-placeholder="qcBlockNamePlaceholder" style="font-weight:bold; font-size:1.1rem; border:none; border-bottom:1px solid #ccc; flex:1;">
+            <input class="data-field" data-key="name" style="font-weight:bold; font-size:1.1rem; border:none; border-bottom:1px solid #ccc; flex:1;">
             <button class="btn danger small delQcBtn no-print" data-i18n="delBlock">Удалить блок</button>
         </div>
         <table>
@@ -246,8 +322,8 @@
 
 <template id="qcCheckRowTpl">
     <tr>
-        <td><input class="data-field" data-key="parameter" data-i18n-placeholder="qcParamPlaceholder"></td>
-        <td><input class="data-field" data-key="standard" data-i18n-placeholder="qcStandardPlaceholder"></td>
+        <td><input class="data-field" data-key="parameter"></td>
+        <td><input class="data-field" data-key="standard"></td>
         <td><div class="fill-in"></div></td>
         <td class="no-print row-actions"><button class="btn danger small delQcCheckBtn" data-i18n="del">X</button></td>
     </tr>
@@ -257,122 +333,62 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "routing_map_draft_v3.6";
+    const STORAGE_KEY = "routing_map_draft_v4.0";
     const LANG_KEY = "routing_map_lang";
 
     // --- I18N - INTERNATIONALIZATION ---
     const translations = {
         ru: {
-            pageTitle: "Маршрутная карта v3.6",
+            pageTitle: "Маршрутная карта v4.0",
             title: "Маршрутная карта",
-            print: "🖨️ Печать / PDF",
-            save: "💾 Сохранить JSON",
-            load: "📁 Загрузить JSON",
-            clear: "❌ Очистить форму",
+            print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
+            printOptions: "Опции печати",
+            printNamePriority: "Основное наименование в рецептуре:",
+            printTradeName: "Торговое название", printInciName: "INCI",
+            printShowBlocks: "Показывать блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
+            printShowColumns: "Показывать колонки:", printSupplier: "Поставщик", printNotes: "Примечания",
             meta: "Карточка изделия",
-            productName: "Наименование продукта",
-            productCode: "Код / Артикул",
-            version: "Версия",
-            date: "Дата документа",
-            author: "Технолог",
-            batchSize: "Размер партии (кг)",
-            formulation: "Рецептура",
-            totalPercent: "Сумма %:",
-            phase: "Фаза",
-            trade: "Наименование",
-            analysisSheet: "Аналит. лист",
-            percent: "%",
-            mass: "Загрузка, кг",
-            actions: "Действия",
-            actualMass: "Факт, кг",
+            productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
+            formulation: "Рецептура", totalPercent: "Сумма %:",
+            phase: "Фаза", tradeName: "Торг. название", inciName: "INCI", supplier: "Поставщик", notes: "Примечания", percent: "%", mass: "Загрузка, кг", actions: "Действия", actualMass: "Факт, кг",
             addIngredient: "➕ Добавить ингредиент",
-            process: "Технологический процесс",
-            step: "№",
-            description: "Описание операции",
-            equipment: "Оборудование",
-            paramName: "Параметр процесса",
-            norm: "Норма",
-            actual: "Факт",
+            performance: "Данные об эффективности", perfParam: "Параметр", perfValue: "Значение", addPerf: "➕ Добавить параметр",
+            stability: "Данные о стабильности", stabCondition: "Условие", stabResult: "Результат", addStab: "➕ Добавить тест",
+            process: "Технологический процесс", step: "№", opDescription: "Описание операции", equipment: "Оборудование", paramName: "Параметр процесса", norm: "Норма", actual: "Факт",
             addStep: "➕ Добавить стадию",
-            qc: "Контроль качества (ОКК)",
-            addQc: "➕ Добавить блок контроля",
+            qc: "Контроль качества (ОКК)", addQc: "➕ Добавить блок контроля",
             foot: "Автосохранение включено.",
-            del: "Удалить",
-            delBlock: "Удалить блок",
-            addParam: "➕ Параметр",
-            addQcCheck: "➕ Добавить проверку",
+            del: "Удалить", delBlock: "Удалить блок", addParam: "➕ Параметр", addQcCheck: "➕ Добавить проверку",
             phaseHeader: "Фаза",
-            dataLoaded: "Данные успешно загружены!",
-            fileReadError: "Ошибка чтения файла: ",
-            confirmDelete: "Вы уверены?",
-            confirmClear: "Вы уверены, что хотите полностью очистить форму? Все несохраненные данные будут потеряны.",
-            confirmDeleteBlock: "Удалить весь блок контроля?",
-            phasePlaceholder: "A",
-            tradeNamePlaceholder: "Вода очищенная",
-            paramNamePlaceholder: "Температура, °C",
-            normPlaceholder: "75-80",
-            qcBlockNamePlaceholder: "Контроль-1 на стадии X",
-            qcParamName: "Наименование показателя",
-            qcStandard: "Норматив",
-            qcResult: "Результат",
-            qcParamPlaceholder: "Внешний вид",
-            qcStandardPlaceholder: "Однородная масса",
+            dataLoaded: "Данные успешно загружены!", fileReadError: "Ошибка чтения файла: ",
+            confirmDelete: "Вы уверены?", confirmClear: "Вы уверены, что хотите полностью очистить форму? Все несохраненные данные будут потеряны.", confirmDeleteBlock: "Удалить весь блок контроля?",
+            qcParamName: "Наименование показателя", qcStandard: "Норматив", qcResult: "Результат",
         },
         en: {
-            pageTitle: "Manufacturing Route Card v3.6",
+            pageTitle: "Manufacturing Route Card v4.0",
             title: "Manufacturing Route Card",
-            print: "🖨️ Print / PDF",
-            save: "💾 Save JSON",
-            load: "📁 Load JSON",
-            clear: "❌ Clear Form",
+            print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
+            printOptions: "Print Options",
+            printNamePriority: "Primary name in formulation:",
+            printTradeName: "Trade Name", printInciName: "INCI",
+            printShowBlocks: "Show blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
+            printShowColumns: "Show columns:", printSupplier: "Supplier", printNotes: "Notes",
             meta: "Product Information",
-            productName: "Product Name",
-            productCode: "Code / SKU",
-            version: "Version",
-            date: "Document Date",
-            author: "Technologist",
-            batchSize: "Batch Size (kg)",
-            formulation: "Formulation",
-            totalPercent: "Total %:",
-            phase: "Phase",
-            trade: "Trade Name",
-            analysisSheet: "Analysis Sheet",
-            percent: "%",
-            mass: "Load, kg",
-            actions: "Actions",
-            actualMass: "Actual, kg",
+            productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
+            formulation: "Formulation", totalPercent: "Total %:",
+            phase: "Phase", tradeName: "Trade Name", inciName: "INCI", supplier: "Supplier", notes: "Notes", percent: "%", mass: "Load, kg", actions: "Actions", actualMass: "Actual, kg",
             addIngredient: "➕ Add Ingredient",
-            process: "Technological Process",
-            step: "#",
-            description: "Operation Description",
-            equipment: "Equipment",
-            paramName: "Process Parameter",
-            norm: "Standard",
-            actual: "Actual",
+            performance: "Performance Data", perfParam: "Parameter", perfValue: "Value", addPerf: "➕ Add Parameter",
+            stability: "Stability Data", stabCondition: "Condition", stabResult: "Result", addStab: "➕ Add Test",
+            process: "Technological Process", step: "#", opDescription: "Operation Description", equipment: "Equipment", paramName: "Process Parameter", norm: "Standard", actual: "Actual",
             addStep: "➕ Add Step",
-            qc: "Quality Control (QC)",
-            addQc: "➕ Add QC Block",
+            qc: "Quality Control (QC)", addQc: "➕ Add QC Block",
             foot: "Autosave is enabled.",
-            del: "Delete",
-            delBlock: "Delete block",
-            addParam: "➕ Parameter",
-            addQcCheck: "➕ Add Check",
+            del: "Delete", delBlock: "Delete block", addParam: "➕ Parameter", addQcCheck: "➕ Add Check",
             phaseHeader: "Phase",
-            dataLoaded: "Data loaded successfully!",
-            fileReadError: "File read error: ",
-            confirmDelete: "Are you sure?",
-            confirmClear: "Are you sure you want to clear the entire form? All unsaved data will be lost.",
-            confirmDeleteBlock: "Delete the entire control block?",
-            phasePlaceholder: "A",
-            tradeNamePlaceholder: "Purified water",
-            paramNamePlaceholder: "Temperature, °C",
-            normPlaceholder: "75-80",
-            qcBlockNamePlaceholder: "QC-1 at stage X",
-            qcParamName: "Parameter Name",
-            qcStandard: "Standard",
-            qcResult: "Result",
-            qcParamPlaceholder: "Appearance",
-            qcStandardPlaceholder: "Homogeneous mass",
+            dataLoaded: "Data loaded successfully!", fileReadError: "File read error: ",
+            confirmDelete: "Are you sure?", confirmClear: "Are you sure you want to clear the entire form? All unsaved data will be lost.", confirmDeleteBlock: "Delete the entire control block?",
+            qcParamName: "Parameter Name", qcStandard: "Standard", qcResult: "Result",
         }
     };
     let currentLang = localStorage.getItem(LANG_KEY) || 'ru';
@@ -389,17 +405,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         $$('[data-i18n]').forEach(el => {
             const key = el.dataset.i18n;
-            el.textContent = i18n(key);
-        });
-        $$('[data-i18n-placeholder]').forEach(el => {
-            const key = el.dataset.i18nPlaceholder;
-            el.placeholder = i18n(key);
+            if (el.tagName === 'OPTION') {
+                el.label = i18n(key);
+            } else {
+                el.textContent = i18n(key);
+            }
         });
         renderAll();
     };
 
     // --- HELPER FUNCTIONS ---
-    const generateId = () => crypto.randomUUID?.() || String(Date.now() + Math.random());
+    const generateId = () => `id_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
@@ -415,8 +431,10 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getInitialState = () => ({
-        meta: { productName: '', productCode: '', docVersion: '1.0', docDate: new Date().toISOString().slice(0,10), author: '', batchSize: 100 },
+        meta: { productName: '', productCode: '', docVersion: '1.0', docDate: new Date().toISOString().slice(0,10), author: '', batchSize: 100, description: '' },
         ingredients: [],
+        performanceData: [],
+        stabilityData: [],
         processSteps: [],
         qualityControl: []
     });
@@ -426,15 +444,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const normalized = {
             meta: { ...defaults.meta, ...(data.meta || {}) },
             ingredients: Array.isArray(data.ingredients) ? data.ingredients : defaults.ingredients,
+            performanceData: Array.isArray(data.performanceData) ? data.performanceData : defaults.performanceData,
+            stabilityData: Array.isArray(data.stabilityData) ? data.stabilityData : defaults.stabilityData,
             processSteps: Array.isArray(data.processSteps) ? data.processSteps : defaults.processSteps,
             qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl
         };
+        // Backward compatibility for old 'name' field
+        normalized.ingredients.forEach(ing => {
+            if (ing.name && !ing.tradeName) {
+                ing.tradeName = ing.name;
+                delete ing.name;
+            }
+        });
         return normalized;
     }
 
     let state = getInitialState();
 
     // --- RENDER FUNCTIONS ---
+    const renderSimpleTable = (tbodyId, data, templateId, keys) => {
+        const tbody = $(tbodyId);
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            const tpl = $(templateId).content.cloneNode(true);
+            const row = tpl.querySelector('tr');
+            row.dataset.id = item.id;
+            keys.forEach(key => {
+                row.querySelector(`[data-key="${key}"]`).value = item[key] || '';
+            });
+            row.querySelector('.delBtn').textContent = i18n('del');
+            tbody.appendChild(row);
+        });
+    };
+
     const renderIngredients = () => {
         const tbody = $('#formBody');
         tbody.innerHTML = '';
@@ -447,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 tr.className = 'phase-header';
                 const td = document.createElement('td');
-                td.colSpan = 7;
+                td.colSpan = 9;
                 td.textContent = `${i18n('phaseHeader')} ${currentPhase}`;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
@@ -457,14 +499,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const tpl = $('#ingredientRowTpl').content.cloneNode(true);
             const row = tpl.querySelector('tr');
             row.dataset.id = ing.id;
-            row.querySelector('[data-key="phase"]').value = ing.phase || '';
-            row.querySelector('[data-key="phase"]').placeholder = i18n('phasePlaceholder');
-            const tradeNameTextarea = row.querySelector('[data-key="tradeName"]');
-            tradeNameTextarea.value = ing.tradeName || '';
-            tradeNameTextarea.placeholder = i18n('tradeNamePlaceholder');
-            row.querySelector('[data-key="tradeName-print"]').textContent = ing.tradeName || '';
-            row.querySelector('[data-key="analysisSheet"]').value = ing.analysisSheet || '';
-            row.querySelector('[data-key="percent"]').value = ing.percent || 0;
+            ['phase', 'tradeName', 'inciName', 'supplier', 'notes', 'percent'].forEach(key => {
+                const el = row.querySelector(`[data-key="${key}"]`);
+                if (el) el.value = ing[key] || '';
+                if (el && el.tagName === 'TEXTAREA') {
+                    row.querySelector(`[data-key="${key}-print"]`).textContent = ing[key] || '';
+                }
+            });
             row.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(ing.percent) || 0) / 100).toFixed(3);
             row.querySelector('.delBtn').textContent = i18n('del');
             tbody.appendChild(row);
@@ -492,25 +533,20 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = step.number || '';
             numberCell.appendChild(input);
 
-            const descCell = stepRow.querySelector('.step-description');
-            descCell.querySelector('[data-key="description"]').value = step.description || '';
-            descCell.querySelector('[data-key="description-print"]').textContent = step.description || '';
-            descCell.setAttribute('rowspan', rowspan);
-
-            const equipCell = stepRow.querySelector('.step-equipment');
-            equipCell.querySelector('[data-key="equipment"]').value = step.equipment || '';
-            equipCell.querySelector('[data-key="equipment-print"]').textContent = step.equipment || '';
-            equipCell.setAttribute('rowspan', rowspan);
+            ['description', 'equipment'].forEach(key => {
+                const cell = stepRow.querySelector(`.step-${key}`);
+                cell.querySelector(`[data-key="${key}"]`).value = step[key] || '';
+                cell.querySelector(`[data-key="${key}-print"]`).textContent = step[key] || '';
+                cell.setAttribute('rowspan', rowspan);
+            });
 
             if (numParams > 0) {
                 const firstParam = step.parameters[0];
                 const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
                 const paramCells = Array.from(paramTpl.querySelector('tr').children);
                 paramCells[0].querySelector('input').value = firstParam.name || '';
-                paramCells[0].querySelector('input').placeholder = i18n('paramNamePlaceholder');
                 paramCells[0].querySelector('input').dataset.paramId = firstParam.id;
                 paramCells[1].querySelector('input').value = firstParam.norm || '';
-                paramCells[1].querySelector('input').placeholder = i18n('normPlaceholder');
                 paramCells[1].querySelector('input').dataset.paramId = firstParam.id;
                 paramCells[2].querySelector('button').dataset.paramId = firstParam.id;
                 paramCells[2].querySelector('button').textContent = 'X';
@@ -537,10 +573,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     const subsequentParamRow = subsequentParamTpl.querySelector('tr');
                     subsequentParamRow.dataset.id = step.id;
                     subsequentParamRow.querySelector('[data-key="name"]').value = param.name || '';
-                    subsequentParamRow.querySelector('[data-key="name"]').placeholder = i18n('paramNamePlaceholder');
                     subsequentParamRow.querySelector('[data-key="name"]').dataset.paramId = param.id;
                     subsequentParamRow.querySelector('[data-key="norm"]').value = param.norm || '';
-                    subsequentParamRow.querySelector('[data-key="norm"]').placeholder = i18n('normPlaceholder');
                     subsequentParamRow.querySelector('[data-key="norm"]').dataset.paramId = param.id;
                     const delParamBtn = subsequentParamRow.querySelector('.delParamBtn');
                     delParamBtn.dataset.paramId = param.id;
@@ -569,14 +603,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const blockEl = blockTpl.querySelector('.qc-block');
             blockEl.dataset.id = qcBlock.id;
             blockEl.querySelector('[data-key="name"]').value = qcBlock.name || '';
-            blockEl.querySelector('[data-key="name"]').placeholder = i18n('qcBlockNamePlaceholder');
             blockEl.querySelector('.delQcBtn').textContent = i18n('delBlock');
             blockEl.querySelector('.addQcCheckBtn').textContent = `➕ ${i18n('addQcCheck')}`;
             
-            blockEl.querySelector('[data-i18n="qcParamName"]').textContent = i18n('qcParamName');
-            blockEl.querySelector('[data-i18n="qcStandard"]').textContent = i18n('qcStandard');
-            blockEl.querySelector('[data-i18n="qcResult"]').textContent = i18n('qcResult');
-            blockEl.querySelector('[data-i18n="actions"]').textContent = i18n('actions');
+            ['qcParamName', 'qcStandard', 'qcResult', 'actions'].forEach(key => {
+                const th = blockEl.querySelector(`[data-i18n="${key}"]`);
+                if (th) th.textContent = i18n(key);
+            });
 
             const tbody = blockEl.querySelector('tbody');
             
@@ -586,9 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 checkRow.dataset.id = qcBlock.id;
                 checkRow.dataset.checkId = check.id;
                 checkRow.querySelector('[data-key="parameter"]').value = check.parameter || '';
-                checkRow.querySelector('[data-key="parameter"]').placeholder = i18n('qcParamPlaceholder');
                 checkRow.querySelector('[data-key="standard"]').value = check.standard || '';
-                checkRow.querySelector('[data-key="standard"]').placeholder = i18n('qcStandardPlaceholder');
                 checkRow.querySelector('.delQcCheckBtn').textContent = 'X';
                 tbody.appendChild(checkRow);
             });
@@ -598,6 +629,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderAll = () => {
         renderIngredients();
+        renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']);
+        renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']);
         renderProcess();
         renderQc();
         $$('textarea').forEach(autoExpand);
@@ -630,6 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const el = $(`#${key}`);
             if (el) el.value = state.meta[key];
         });
+        $('#description-print').textContent = state.meta.description || '';
         renderAll();
     };
 
@@ -638,8 +672,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const key = e.target.dataset.key;
         const value = e.target.value;
 
-        const ingRow = e.target.closest('tr[data-id]:not([data-param-id])');
-        if (ingRow && $('#formBody').contains(ingRow)) {
+        const findAndSet = (collection, row, key, value) => {
+            const item = collection.find(i => i.id == row.dataset.id);
+            if (item) item[key] = value;
+        };
+
+        const ingRow = e.target.closest('#formBody tr[data-id]');
+        if (ingRow) {
             const item = state.ingredients.find(i => i.id == ingRow.dataset.id);
             if (item) {
                 item[key] = value;
@@ -670,9 +709,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
+        
+        const perfRow = e.target.closest('#perfBody tr[data-id]');
+        if (perfRow) findAndSet(state.performanceData, perfRow, key, value);
 
-        const procRow = e.target.closest('tr[data-id]');
-        if (procRow && $('#procBody').contains(procRow)) {
+        const stabRow = e.target.closest('#stabBody tr[data-id]');
+        if (stabRow) findAndSet(state.stabilityData, stabRow, key, value);
+
+        const procRow = e.target.closest('#procBody tr[data-id]');
+        if (procRow) {
             const step = state.processSteps.find(s => s.id == procRow.dataset.id);
             if (step) {
                 const paramId = e.target.dataset.paramId;
@@ -740,8 +785,18 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#langEnBtn').addEventListener('click', () => setLanguage('en'));
 
         $('#addIngredientBtn').addEventListener('click', () => {
-            state.ingredients.push({ id: generateId(), phase: '', tradeName: '', percent: 0 });
+            state.ingredients.push({ id: generateId(), phase: '', tradeName: '', inciName: '', supplier: '', notes: '', percent: 0 });
             renderIngredients(); debouncedSave();
+        });
+        $('#addPerfBtn').addEventListener('click', () => {
+            state.performanceData.push({ id: generateId(), parameter: '', value: '' });
+            renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']);
+            debouncedSave();
+        });
+        $('#addStabBtn').addEventListener('click', () => {
+            state.stabilityData.push({ id: generateId(), condition: '', result: '' });
+            renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']);
+            debouncedSave();
         });
         $('#addProcBtn').addEventListener('click', () => {
             state.processSteps.push({ id: generateId(), number: '', description: '', equipment: '', parameters: [] });
@@ -774,16 +829,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (e.target.classList.contains('delBtn')) {
                 if (!confirm(i18n('confirmDelete'))) return;
-                const ingRow = e.target.closest('tr[data-id]');
-                if (ingRow && $('#formBody').contains(ingRow)) {
-                    state.ingredients = state.ingredients.filter(i => i.id != ingRow.dataset.id);
-                    renderIngredients(); needsSave = true;
-                }
-                const procRow = e.target.closest('tr[data-id]');
-                if (procRow && $('#procBody').contains(procRow)) {
-                    state.processSteps = state.processSteps.filter(s => s.id != procRow.dataset.id);
-                    renderProcess(); needsSave = true;
-                }
+                const row = e.target.closest('tr[data-id]');
+                if (!row) return;
+                const id = row.dataset.id;
+                if ($('#formBody').contains(row)) { state.ingredients = state.ingredients.filter(i => i.id != id); renderIngredients(); needsSave = true; }
+                if ($('#perfBody').contains(row)) { state.performanceData = state.performanceData.filter(i => i.id != id); renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']); needsSave = true; }
+                if ($('#stabBody').contains(row)) { state.stabilityData = state.stabilityData.filter(i => i.id != id); renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']); needsSave = true; }
+                if ($('#procBody').contains(row)) { state.processSteps = state.processSteps.filter(s => s.id != id); renderProcess(); needsSave = true; }
             }
             if (e.target.classList.contains('delParamBtn')) {
                 const paramRow = e.target.closest('tr');
@@ -818,6 +870,9 @@ document.addEventListener('DOMContentLoaded', () => {
             handleUpdate(e);
             if (e.target.tagName.toLowerCase() === 'textarea') {
                 autoExpand(e.target);
+                if (e.target.id === 'description') {
+                    $('#description-print').textContent = e.target.value;
+                }
             }
             debouncedSave();
         });
@@ -825,6 +880,20 @@ document.addEventListener('DOMContentLoaded', () => {
             state.meta.batchSize = e.target.value;
             renderIngredients();
         });
+
+        // Print options listeners
+        const updatePrintClasses = () => {
+            document.body.classList.toggle('print-hide-description', !$('#printShowDescription').checked);
+            document.body.classList.toggle('print-hide-performance', !$('#printShowPerformance').checked);
+            document.body.classList.toggle('print-hide-stability', !$('#printShowStability').checked);
+            document.body.classList.toggle('print-hide-supplier', !$('#printShowSupplier').checked);
+            document.body.classList.toggle('print-hide-notes', !$('#printShowNotes').checked);
+            
+            const namePriority = $('#printNameSelect').value;
+            document.body.classList.toggle('print-name-trade', namePriority === 'trade');
+            document.body.classList.toggle('print-name-inci', namePriority === 'inci');
+        };
+        $$('.print-options input, .print-options select').forEach(el => el.addEventListener('change', updatePrintClasses));
 
         // Initial load
         const savedState = localStorage.getItem(STORAGE_KEY);
@@ -837,6 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
             $('#docDate').value = new Date().toISOString().slice(0,10);
         }
         setLanguage(currentLang);
+        updatePrintClasses();
     }
 
     initialize();
