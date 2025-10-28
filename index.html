@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Маршрутная карта v4.2</title>
+    <title data-i18n="pageTitle">Маршрутная карта v4.3</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -223,6 +223,21 @@
         <div class="section-actions no-print"><button class="btn primary small" id="addStabBtn" data-i18n="addStab">➕ Добавить тест</button></div>
     </div>
 
+    <!-- EQUIPMENT LIST -->
+    <div class="card">
+        <h2 data-i18n="equipmentList">Список оборудования</h2>
+        <table id="equipmentTable">
+            <thead><tr>
+                <th style="width:15%" data-i18n="eqShortName">ID / Код</th>
+                <th style="width:35%" data-i18n="eqFullName">Полное наименование</th>
+                <th style="width:35%" data-i18n="eqNotes">Примечания / Функция</th>
+                <th style="width:15%" class="no-print" data-i18n="actions">Действия</th>
+            </tr></thead>
+            <tbody id="equipmentBody"></tbody>
+        </table>
+        <div class="section-actions no-print"><button class="btn primary small" id="addEquipmentBtn" data-i18n="addEquipment">➕ Добавить оборудование</button></div>
+    </div>
+
     <!-- PROCESS TABLE -->
     <div class="card">
         <h2 data-i18n="process">Технологический процесс</h2>
@@ -292,6 +307,15 @@
     </tr>
 </template>
 
+<template id="equipmentRowTpl">
+    <tr>
+        <td><input class="data-field" data-key="shortName"></td>
+        <td><input class="data-field" data-key="fullName"></td>
+        <td><textarea class="data-field" data-key="notes" rows="1"></textarea></td>
+        <td class="no-print row-actions"><button class="btn danger small delBtn" data-i18n="del">Удалить</button></td>
+    </tr>
+</template>
+
 <template id="procStepRowTpl">
     <tr class="step-header">
         <td class="step-number" style="text-align: center; vertical-align: middle;"></td>
@@ -349,13 +373,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "routing_map_draft_v4.2";
+    const STORAGE_KEY = "routing_map_draft_v4.3";
     const LANG_KEY = "routing_map_lang";
 
     // --- I18N - INTERNATIONALIZATION ---
     const translations = {
         ru: {
-            pageTitle: "Маршрутная карта v4.2",
+            pageTitle: "Маршрутная карта v4.3",
             title: "Маршрутная карта",
             print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
             printNamePriority: "Основное наименование:",
@@ -369,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addIngredient: "➕ Добавить ингредиент",
             performance: "Данные об эффективности", perfParam: "Параметр", perfValue: "Значение", addPerf: "➕ Добавить параметр",
             stability: "Данные о стабильности", stabCondition: "Условие", stabResult: "Результат", addStab: "➕ Добавить тест",
+            equipmentList: "Список оборудования", eqShortName: "ID / Код", eqFullName: "Полное наименование", eqNotes: "Примечания / Функция", addEquipment: "➕ Добавить оборудование",
             process: "Технологический процесс", step: "№", opDescription: "Описание операции", equipment: "Оборудование", paramName: "Параметр процесса", norm: "Норма", actual: "Факт",
             addStep: "➕ Добавить стадию",
             qc: "Контроль качества (ОКК)", addQc: "➕ Добавить блок контроля",
@@ -380,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
             qcParamName: "Наименование показателя", qcStandard: "Норматив", qcResult: "Результат",
         },
         en: {
-            pageTitle: "Technical Specification v4.2",
+            pageTitle: "Technical Specification v4.3",
             title: "Technical Specification",
             print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
             printNamePriority: "Primary Name:",
@@ -394,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
             addIngredient: "➕ Add Ingredient",
             performance: "Performance Data", perfParam: "Parameter", perfValue: "Value", addPerf: "➕ Add Parameter",
             stability: "Stability Data", stabCondition: "Condition", stabResult: "Result", addStab: "➕ Add Test",
+            equipmentList: "Equipment List", eqShortName: "ID / Code", eqFullName: "Full Name", eqNotes: "Notes / Function", addEquipment: "➕ Add Equipment",
             process: "Technological Process", step: "#", opDescription: "Operation Description", equipment: "Equipment", paramName: "Process Parameter", norm: "Standard", actual: "Actual",
             addStep: "➕ Add Step",
             qc: "Quality Control (QC)", addQc: "➕ Add QC Block",
@@ -449,6 +475,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ingredients: [],
         performanceData: [],
         stabilityData: [],
+        equipment: [],
         processSteps: [],
         qualityControl: []
     });
@@ -460,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ingredients: Array.isArray(data.ingredients) ? data.ingredients : defaults.ingredients,
             performanceData: Array.isArray(data.performanceData) ? data.performanceData : defaults.performanceData,
             stabilityData: Array.isArray(data.stabilityData) ? data.stabilityData : defaults.stabilityData,
+            equipment: Array.isArray(data.equipment) ? data.equipment : defaults.equipment,
             processSteps: Array.isArray(data.processSteps) ? data.processSteps : defaults.processSteps,
             qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl
         };
@@ -484,7 +512,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const row = tpl.querySelector('tr');
             row.dataset.id = item.id;
             keys.forEach(key => {
-                row.querySelector(`[data-key="${key}"]`).value = item[key] || '';
+                const el = row.querySelector(`[data-key="${key}"]`);
+                if (el) el.value = item[key] || '';
             });
             row.querySelector('.delBtn').textContent = i18n('del');
             tbody.appendChild(row);
@@ -503,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 tr.className = 'phase-header';
                 const td = document.createElement('td');
-                td.colSpan = 10; // <-- Updated colspan
+                td.colSpan = 10;
                 td.textContent = `${i18n('phaseHeader')} ${currentPhase}`;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
@@ -645,6 +674,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderIngredients();
         renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']);
         renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']);
+        renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']);
         renderProcess();
         renderQc();
         $$('textarea').forEach(autoExpand);
@@ -729,6 +759,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const stabRow = e.target.closest('#stabBody tr[data-id]');
         if (stabRow) findAndSet(state.stabilityData, stabRow, key, value);
+
+        const equipRow = e.target.closest('#equipmentBody tr[data-id]');
+        if (equipRow) findAndSet(state.equipment, equipRow, key, value);
 
         const procRow = e.target.closest('#procBody tr[data-id]');
         if (procRow) {
@@ -829,6 +862,11 @@ document.addEventListener('DOMContentLoaded', () => {
             renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']);
             debouncedSave();
         });
+        $('#addEquipmentBtn').addEventListener('click', () => {
+            state.equipment.push({ id: generateId(), shortName: '', fullName: '', notes: '' });
+            renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']);
+            debouncedSave();
+        });
         $('#addProcBtn').addEventListener('click', () => {
             state.processSteps.push({ id: generateId(), number: '', description: '', equipment: '', parameters: [] });
             renderProcess(); debouncedSave();
@@ -866,6 +904,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if ($('#formBody').contains(row)) { state.ingredients = state.ingredients.filter(i => i.id != id); renderIngredients(); needsSave = true; }
                 if ($('#perfBody').contains(row)) { state.performanceData = state.performanceData.filter(i => i.id != id); renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']); needsSave = true; }
                 if ($('#stabBody').contains(row)) { state.stabilityData = state.stabilityData.filter(i => i.id != id); renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']); needsSave = true; }
+                if ($('#equipmentBody').contains(row)) { state.equipment = state.equipment.filter(i => i.id != id); renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']); needsSave = true; }
                 if ($('#procBody').contains(row)) { state.processSteps = state.processSteps.filter(s => s.id != id); renderProcess(); needsSave = true; }
             }
             if (e.target.classList.contains('delParamBtn')) {
