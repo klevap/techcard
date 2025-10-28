@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Маршрутная карта v4.1</title>
+    <title data-i18n="pageTitle">Маршрутная карта v4.2</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -94,6 +94,7 @@
             body.print-hide-performance .performance-card,
             body.print-hide-stability .stability-card,
             body.print-hide-supplier .supplier-col,
+            body.print-hide-function .func-col,
             body.print-hide-notes .notes-col { display: none; }
             
             body.print-name-trade .inci-col,
@@ -144,6 +145,7 @@
             </div>
             <div class="option-group">
                 <strong data-i18n="printShowColumns">Колонки:</strong>
+                <input type="checkbox" id="printShowFunction" checked><label for="printShowFunction" data-i18n="printFunction">Функция</label>
                 <input type="checkbox" id="printShowSupplier" checked><label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
                 <input type="checkbox" id="printShowNotes" checked><label for="printShowNotes" data-i18n="printNotes">Примечания</label>
             </div>
@@ -178,13 +180,14 @@
         <table id="formTable">
             <thead><tr>
                 <th style="width:5%" data-i18n="phase">Фаза</th>
-                <th class="trade-col" style="width:25%" data-i18n="tradeName">Торг. название</th>
-                <th class="inci-col" style="width:25%" data-i18n="inciName">INCI</th>
+                <th class="trade-col" style="width:20%" data-i18n="tradeName">Торг. название</th>
+                <th class="inci-col" style="width:20%" data-i18n="inciName">INCI</th>
+                <th class="func-col" style="width:15%" data-i18n="func">Функция</th>
                 <th class="supplier-col" style="width:10%" data-i18n="supplier">Поставщик</th>
                 <th class="notes-col" style="width:10%" data-i18n="notes">Примечания</th>
                 <th style="width:6%" data-i18n="percent">%</th>
                 <th style="width:8%" data-i18n="mass">Загрузка, кг</th>
-                <th style="width:11%" class="no-print" data-i18n="actions">Действия</th>
+                <th style="width:6%" class="no-print" data-i18n="actions">Действия</th>
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
             </tr></thead>
             <tbody id="formBody"></tbody>
@@ -259,6 +262,10 @@
         <td class="inci-col">
             <textarea class="data-field" data-key="inciName" rows="1"></textarea>
             <div class="print-content" data-key="inciName-print"></div>
+        </td>
+        <td class="func-col">
+            <textarea class="data-field" data-key="func" rows="1"></textarea>
+            <div class="print-content" data-key="func-print"></div>
         </td>
         <td class="supplier-col"><input class="data-field" data-key="supplier"></td>
         <td class="notes-col"><input class="data-field" data-key="notes"></td>
@@ -342,23 +349,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "routing_map_draft_v4.1";
+    const STORAGE_KEY = "routing_map_draft_v4.2";
     const LANG_KEY = "routing_map_lang";
 
     // --- I18N - INTERNATIONALIZATION ---
     const translations = {
         ru: {
-            pageTitle: "Маршрутная карта v4.1",
+            pageTitle: "Маршрутная карта v4.2",
             title: "Маршрутная карта",
             print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
             printNamePriority: "Основное наименование:",
             printTradeName: "Торговое название", printInciName: "INCI",
             printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
-            printShowColumns: "Колонки:", printSupplier: "Поставщик", printNotes: "Примечания",
+            printShowColumns: "Колонки:", printFunction: "Функция", printSupplier: "Поставщик", printNotes: "Примечания",
             meta: "Карточка изделия",
             productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
             formulation: "Рецептура", totalPercent: "Сумма %:",
-            phase: "Фаза", tradeName: "Торг. название", inciName: "INCI", supplier: "Поставщик", notes: "Примечания", percent: "%", mass: "Загрузка, кг", actions: "Действия", actualMass: "Факт, кг",
+            phase: "Фаза", tradeName: "Торг. название", inciName: "INCI", func: "Функция", supplier: "Поставщик", notes: "Примечания", percent: "%", mass: "Загрузка, кг", actions: "Действия", actualMass: "Факт, кг",
             addIngredient: "➕ Добавить ингредиент",
             performance: "Данные об эффективности", perfParam: "Параметр", perfValue: "Значение", addPerf: "➕ Добавить параметр",
             stability: "Данные о стабильности", stabCondition: "Условие", stabResult: "Результат", addStab: "➕ Добавить тест",
@@ -373,17 +380,17 @@ document.addEventListener('DOMContentLoaded', () => {
             qcParamName: "Наименование показателя", qcStandard: "Норматив", qcResult: "Результат",
         },
         en: {
-            pageTitle: "Technical Specification v4.1",
+            pageTitle: "Technical Specification v4.2",
             title: "Technical Specification",
             print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
             printNamePriority: "Primary Name:",
             printTradeName: "Trade Name", printInciName: "INCI",
             printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
-            printShowColumns: "Columns:", printSupplier: "Supplier", printNotes: "Notes",
+            printShowColumns: "Columns:", printFunction: "Function", printSupplier: "Supplier", printNotes: "Notes",
             meta: "Product Information",
             productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
             formulation: "Formulation", totalPercent: "Total %:",
-            phase: "Phase", tradeName: "Trade Name", inciName: "INCI", supplier: "Supplier", notes: "Notes", percent: "%", mass: "Load, kg", actions: "Actions", actualMass: "Actual, kg",
+            phase: "Phase", tradeName: "Trade Name", inciName: "INCI", func: "Function", supplier: "Supplier", notes: "Notes", percent: "%", mass: "Load, kg", actions: "Actions", actualMass: "Actual, kg",
             addIngredient: "➕ Add Ingredient",
             performance: "Performance Data", perfParam: "Parameter", perfValue: "Value", addPerf: "➕ Add Parameter",
             stability: "Stability Data", stabCondition: "Condition", stabResult: "Result", addStab: "➕ Add Test",
@@ -496,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const tr = document.createElement('tr');
                 tr.className = 'phase-header';
                 const td = document.createElement('td');
-                td.colSpan = 9;
+                td.colSpan = 10; // <-- Updated colspan
                 td.textContent = `${i18n('phaseHeader')} ${currentPhase}`;
                 tr.appendChild(td);
                 tbody.appendChild(tr);
@@ -506,7 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const tpl = $('#ingredientRowTpl').content.cloneNode(true);
             const row = tpl.querySelector('tr');
             row.dataset.id = ing.id;
-            ['phase', 'tradeName', 'inciName', 'supplier', 'notes', 'percent'].forEach(key => {
+            ['phase', 'tradeName', 'inciName', 'func', 'supplier', 'notes', 'percent'].forEach(key => {
                 const el = row.querySelector(`[data-key="${key}"]`);
                 if (el) el.value = ing[key] || '';
                 if (el && el.tagName === 'TEXTAREA') {
@@ -809,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#langEnBtn').addEventListener('click', () => setLanguage('en'));
 
         $('#addIngredientBtn').addEventListener('click', () => {
-            state.ingredients.push({ id: generateId(), phase: '', tradeName: '', inciName: '', supplier: '', notes: '', percent: 0 });
+            state.ingredients.push({ id: generateId(), phase: '', tradeName: '', inciName: '', func: '', supplier: '', notes: '', percent: 0 });
             renderIngredients(); debouncedSave();
         });
         $('#addPerfBtn').addEventListener('click', () => {
@@ -910,6 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.toggle('print-hide-description', !$('#printShowDescription').checked);
             document.body.classList.toggle('print-hide-performance', !$('#printShowPerformance').checked);
             document.body.classList.toggle('print-hide-stability', !$('#printShowStability').checked);
+            document.body.classList.toggle('print-hide-function', !$('#printShowFunction').checked);
             document.body.classList.toggle('print-hide-supplier', !$('#printShowSupplier').checked);
             document.body.classList.toggle('print-hide-notes', !$('#printShowNotes').checked);
             
