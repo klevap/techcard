@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n="pageTitle">Маршрутная карта v4.0</title>
+    <title data-i18n="pageTitle">Маршрутная карта v4.1</title>
     <style>
         :root {
             --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
@@ -59,9 +59,14 @@
         .print-only { display: none; }
         .fill-in { min-height: 1.3em; }
         .print-content { display: none; }
-        .print-options { background: var(--header-bg); padding: 10px; border-radius: 8px; display: flex; flex-direction: column; gap: 8px; }
-        .print-options-grid { display: grid; grid-template-columns: auto 1fr; gap: 5px 15px; align-items: center; }
-        .print-options-grid label { margin: 0; font-weight: normal; color: var(--ink); }
+        
+        /* Compact Print Options */
+        .print-options-compact { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+        .print-options-compact .option-group { display: flex; align-items: center; gap: 8px; }
+        .print-options-compact label { margin: 0; font-weight: normal; color: var(--ink); white-space: nowrap; }
+        .print-options-compact strong { font-weight: 600; color: var(--muted); }
+        .print-options-compact select { width: auto; padding: 6px 10px; }
+        .print-options-compact input[type="checkbox"] { width: auto; }
 
         @media print {
             body { background: #fff; color: #000; font-size: 10px; line-height: 1.3; }
@@ -93,6 +98,13 @@
             
             body.print-name-trade .inci-col,
             body.print-name-inci .trade-col { display: none; }
+
+            /* Smart print override */
+            body.print-force-hide-description .description-card,
+            body.print-force-hide-performance .performance-card,
+            body.print-force-hide-stability .stability-card {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -114,29 +126,26 @@
         </div>
     </div>
 
-    <!-- PRINT OPTIONS -->
+    <!-- PRINT OPTIONS (COMPACT) -->
     <div class="card no-print">
-        <h2 data-i18n="printOptions">Опции печати</h2>
-        <div class="print-options">
-            <div>
-                <label data-i18n="printNamePriority">Основное наименование в рецептуре:</label>
+        <div class="print-options-compact">
+            <div class="option-group">
+                <label for="printNameSelect" data-i18n="printNamePriority">Основное наименование:</label>
                 <select id="printNameSelect">
                     <option value="trade" data-i18n="printTradeName">Торговое название</option>
                     <option value="inci" data-i18n="printInciName">INCI</option>
                 </select>
             </div>
-            <div class="print-options-grid">
-                <label data-i18n="printShowBlocks">Показывать блоки:</label>
-                <div>
-                    <input type="checkbox" id="printShowDescription" checked><label for="printShowDescription" data-i18n="printDescription">Описание</label>
-                    <input type="checkbox" id="printShowPerformance" checked style="margin-left: 15px;"><label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
-                    <input type="checkbox" id="printShowStability" checked style="margin-left: 15px;"><label for="printShowStability" data-i18n="printStability">Стабильность</label>
-                </div>
-                <label data-i18n="printShowColumns">Показывать колонки:</label>
-                <div>
-                    <input type="checkbox" id="printShowSupplier" checked><label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
-                    <input type="checkbox" id="printShowNotes" checked style="margin-left: 15px;"><label for="printShowNotes" data-i18n="printNotes">Примечания</label>
-                </div>
+            <div class="option-group">
+                <strong data-i18n="printShowBlocks">Блоки:</strong>
+                <input type="checkbox" id="printShowDescription" checked><label for="printShowDescription" data-i18n="printDescription">Описание</label>
+                <input type="checkbox" id="printShowPerformance" checked><label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
+                <input type="checkbox" id="printShowStability" checked><label for="printShowStability" data-i18n="printStability">Стабильность</label>
+            </div>
+            <div class="option-group">
+                <strong data-i18n="printShowColumns">Колонки:</strong>
+                <input type="checkbox" id="printShowSupplier" checked><label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
+                <input type="checkbox" id="printShowNotes" checked><label for="printShowNotes" data-i18n="printNotes">Примечания</label>
             </div>
         </div>
     </div>
@@ -333,20 +342,19 @@
 document.addEventListener('DOMContentLoaded', () => {
     const $ = sel => document.querySelector(sel);
     const $$ = sel => Array.from(document.querySelectorAll(sel));
-    const STORAGE_KEY = "routing_map_draft_v4.0";
+    const STORAGE_KEY = "routing_map_draft_v4.1";
     const LANG_KEY = "routing_map_lang";
 
     // --- I18N - INTERNATIONALIZATION ---
     const translations = {
         ru: {
-            pageTitle: "Маршрутная карта v4.0",
+            pageTitle: "Маршрутная карта v4.1",
             title: "Маршрутная карта",
             print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
-            printOptions: "Опции печати",
-            printNamePriority: "Основное наименование в рецептуре:",
+            printNamePriority: "Основное наименование:",
             printTradeName: "Торговое название", printInciName: "INCI",
-            printShowBlocks: "Показывать блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
-            printShowColumns: "Показывать колонки:", printSupplier: "Поставщик", printNotes: "Примечания",
+            printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
+            printShowColumns: "Колонки:", printSupplier: "Поставщик", printNotes: "Примечания",
             meta: "Карточка изделия",
             productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
             formulation: "Рецептура", totalPercent: "Сумма %:",
@@ -365,14 +373,13 @@ document.addEventListener('DOMContentLoaded', () => {
             qcParamName: "Наименование показателя", qcStandard: "Норматив", qcResult: "Результат",
         },
         en: {
-            pageTitle: "Manufacturing Route Card v4.0",
-            title: "Manufacturing Route Card",
+            pageTitle: "Technical Specification v4.1",
+            title: "Technical Specification",
             print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
-            printOptions: "Print Options",
-            printNamePriority: "Primary name in formulation:",
+            printNamePriority: "Primary Name:",
             printTradeName: "Trade Name", printInciName: "INCI",
-            printShowBlocks: "Show blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
-            printShowColumns: "Show columns:", printSupplier: "Supplier", printNotes: "Notes",
+            printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
+            printShowColumns: "Columns:", printSupplier: "Supplier", printNotes: "Notes",
             meta: "Product Information",
             productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
             formulation: "Formulation", totalPercent: "Total %:",
@@ -750,13 +757,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- EVENT LISTENERS ---
     function initialize() {
-        $('#printBtn').addEventListener('click', () => window.print());
+        $('#printBtn').addEventListener('click', () => {
+            // Smart print logic: add override classes if data is empty
+            document.body.classList.toggle('print-force-hide-description', !state.meta.description?.trim());
+            document.body.classList.toggle('print-force-hide-performance', state.performanceData.length === 0);
+            document.body.classList.toggle('print-force-hide-stability', state.stabilityData.length === 0);
+
+            window.print();
+
+            // Clean up override classes after printing
+            setTimeout(() => {
+                document.body.classList.remove(
+                    'print-force-hide-description', 
+                    'print-force-hide-performance', 
+                    'print-force-hide-stability'
+                );
+            }, 100);
+        });
+
         $('#saveBtn').addEventListener('click', () => {
             saveState();
             const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `${state.meta.productCode || 'routemap'}_${new Date().toISOString().slice(0,10)}.json`;
+            a.download = `${state.meta.productCode || 'techspec'}_${new Date().toISOString().slice(0,10)}.json`;
             a.click();
             URL.revokeObjectURL(a.href);
         });
@@ -893,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.classList.toggle('print-name-trade', namePriority === 'trade');
             document.body.classList.toggle('print-name-inci', namePriority === 'inci');
         };
-        $$('.print-options input, .print-options select').forEach(el => el.addEventListener('change', updatePrintClasses));
+        $$('.print-options-compact input, .print-options-compact select').forEach(el => el.addEventListener('change', updatePrintClasses));
 
         // Initial load
         const savedState = localStorage.getItem(STORAGE_KEY);
