@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "productName": "GENTLE CLARIFYING SHAMPOO",
+    "productCode": "US20160A",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "Seppic",
+    "batchSize": 100,
+    "description": "A clean, sulfate-free shampoo for scalp and hair. It features anionic surfactants for excellent, gentle foam and two thickeners for a clear, flowing gel. Actives are included for beautiful hair and a repaired, purified scalp. Designed to remove product buildup and smooth cuticles."
+  },
+  "ingredients": [
+    { "id": "1", "phase": "A", "tradeName": "Water", "inciName": "Aqua", "func": "Solvent", "supplier": "In-house", "percent": 63.80 },
+    { "id": "2", "phase": "A", "tradeName": "XYLISHINE™ C", "inciName": "Xylitylglucoside, Anhydroxylitol, Maltitol, Xylitol, Pelvetia Canaliculata Extract", "func": "Active", "supplier": "Seppic", "percent": 3.00 },
+    { "id": "3", "phase": "A", "tradeName": "PROTEOL™ APL HEF", "inciName": "Sodium Cocoyl Apple Amino Acids", "func": "Anionic Surfactant", "supplier": "Seppic", "percent": 3.50 },
+    { "id": "4", "phase": "A", "tradeName": "ORAMIX™ L30 EF", "inciName": "Sodium Lauroyl Sarcosinate", "func": "Anionic Surfactant", "supplier": "Seppic", "percent": 15.00 },
+    { "id": "5", "phase": "A", "tradeName": "AMONYL™ 675 SB", "inciName": "Cocamidopropyl Hydroxysultaine", "func": "Amphoteric Surfactant", "supplier": "Seppic", "percent": 5.00 },
+    { "id": "6", "phase": "B", "tradeName": "SEPIMAX ZEN™", "inciName": "Polyacrylate Crosspolymer-6", "func": "Thickener", "supplier": "Seppic", "percent": 0.80 },
+    { "id": "7", "phase": "C", "tradeName": "SOLAGUM™ AX", "inciName": "Acacia Senegal Gum, Xanthan Gum", "func": "Thickener", "supplier": "Seppic", "percent": 0.80 },
+    { "id": "8", "phase": "C", "tradeName": "Glycerin", "inciName": "Glycerin", "func": "Humectant", "supplier": "Generic", "percent": 3.00 },
+    { "id": "9", "phase": "D", "tradeName": "SEA MAYWEED SC", "inciName": "Aqua/Water, Tripleurospermum Maritimum Extract", "func": "Active", "supplier": "Seppic", "percent": 2.50 },
+    { "id": "10", "phase": "D", "tradeName": "Preservative", "inciName": "Benzyl Alcohol, Benzoic Acid, Dehydroacetic Acid, Tocopherol", "func": "Preservative", "supplier": "Schulke", "percent": 1.00 },
+    { "id": "11", "phase": "D", "tradeName": "FLUIDIPURE™ 8G C", "inciName": "Capryloyl Glycine, Xylitylglucoside, Butylene Glycol", "func": "Active", "supplier": "Seppic", "percent": 1.00 },
+    { "id": "12", "phase": "D", "tradeName": "Fragrance \"Bath-Radise\"", "inciName": "Fragrance", "func": "Fragrance", "supplier": "Sozio", "percent": 0.20 },
+    { "id": "13", "phase": "E", "tradeName": "Citric Acid solution 30%", "inciName": "Citric Acid", "func": "pH Adjuster", "supplier": "In-house", "notes": "pH to 5.8", "percent": 0.40 }
+  ],
+  "performanceData": [
+    { "id": "perf1", "parameter": "Aspect", "value": "Off white fluid" },
+    { "id": "perf2", "parameter": "pH", "value": "5.9" },
+    { "id": "perf3", "parameter": "Viscosity (1M at RT, Brookfield LV63V12)", "value": "6,150 mPa·s" }
+  ],
+  "stabilityData": [
+    { "id": "stab1", "condition": "3M at RT, 45°C", "result": "Passed. No significant changes observed." },
+    { "id": "stab2", "condition": "3 F/T cycles -5°C/+40°C", "result": "Passed. No phase separation observed." }
+  ],
+  "equipment": [
+    { "id": "eq1", "shortName": "V-501", "fullName": "Main Processing Vessel (300g)", "notes": "Laboratory beaker with high shear dispersing blade (deflocculator)." },
+    { "id": "eq2", "shortName": "P-501", "fullName": "Premix Beaker (50g)", "notes": "Small beaker for premixing Phase C." },
+    { "id": "eq3", "shortName": "QC-PH-05", "fullName": "Calibrated pH-meter", "notes": "For final pH measurement." },
+    { "id": "eq4", "shortName": "QC-VISC-05", "fullName": "Brookfield LV Viscometer", "notes": "For viscosity measurement." }
+  ],
+  "processSteps": [
+    { "id": "p1", "number": "1", "description": "In the main vessel, combine all ingredients of Phase A. Mix well using a high shear dispersing blade until uniform.", "equipment": "V-501", "parameters": [] },
+    { "id": "p2", "number": "2", "description": "While agitating Phase A, add Phase B (SEPIMAX ZEN™). Continue mixing.", "equipment": "V-501", "parameters": [] },
+    { "id": "p3", "number": "3", "description": "In a separate beaker, pre-mix the components of Phase C (SOLAGUM™ AX and Glycerin). Add this premix to the main vessel (Phase AB).", "equipment": "P-501, V-501", "parameters": [] },
+    { "id": "p4", "number": "4", "description": "Increase the mixing speed and mix until all polymers are fully swelled and the mixture is homogeneous.", "equipment": "V-501", "parameters": [{ "id": "param_speed", "name": "Mixing Speed", "norm": "~1000 rpm" }] },
+    { "id": "p5", "number": "5", "description": "Add the ingredients of Phase D one by one, ensuring each is fully incorporated before adding the next.", "equipment": "V-501", "parameters": [] },
+    { "id": "p6", "number": "6", "description": "Check the pH. Adjust to the target range of 5.5 - 6.0 with Phase E (Citric Acid solution).", "equipment": "V-501, QC-PH-05", "parameters": [{ "id": "param_ph", "name": "Target pH", "norm": "5.5 - 6.0" }] }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        { "id": "qcc0", "parameter": "Appearance", "standard": "Homogeneous, off-white fluid gel" },
+        { "id": "qcc_odor", "parameter": "Odor", "standard": "Characteristic (Bath-Radise)" },
+        { "id": "qcc1", "parameter": "pH value (25°C)", "standard": "5.5 - 6.0" },
+        { "id": "qcc2", "parameter": "Viscosity (Brookfield LV63V12, 25°C)", "standard": "6000 - 6300 mPa·s" },
+        { "id": "qcc_micro", "parameter": "Microbiological Purity", "standard": "Complies with ISO 17516:2014 (Category 2)" }
+      ]
+    }
+  ]
+}

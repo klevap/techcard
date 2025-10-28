@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "productName": "Natural Pearl Shampoo",
+    "productCode": "HB-DE-22-KS-2714800-004",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "BASF",
+    "batchSize": 100,
+    "description": "A natural pearl shampoo featuring a blend of mild, plant-derived surfactants and conditioning agents. It is formulated to have a pearlescent appearance and a high viscosity for a luxurious feel."
+  },
+  "ingredients": [
+    { "id": "1", "phase": "A", "tradeName": "Water, demin.", "inciName": "Aqua", "func": "Solvent", "supplier": "In-house", "percent": 61.50 },
+    { "id": "2", "phase": "A", "tradeName": "Dehyquart® Guar N", "inciName": "Guar Hydroxypropyltrimonium Chloride", "func": "Conditioning agent", "supplier": "BASF", "percent": 0.20 },
+    { "id": "3", "phase": "A", "tradeName": "Citric Acid (50% solution)", "inciName": "Citric Acid", "func": "Neutralizing agent", "supplier": "BASF", "percent": 0.15 },
+    { "id": "4", "phase": "B", "tradeName": "Plantacare® 818 UP", "inciName": "Coco-Glucoside", "func": "Surfactant", "supplier": "BASF", "percent": 14.00 },
+    { "id": "5", "phase": "B", "tradeName": "Plantapon® ACG 50", "inciName": "Sodium Cocoyl Glutamate", "func": "Surfactant", "supplier": "BASF", "percent": 12.00 },
+    { "id": "6", "phase": "B", "tradeName": "Euperlan® NL Pearl", "inciName": "Hydrogenated Vegetable Oil, Cocamidopropyl Betaine, Glyceryl Oleate", "func": "Pearlizer", "supplier": "BASF", "percent": 3.00 },
+    { "id": "7", "phase": "B", "tradeName": "Lamesoft® PO 65", "inciName": "Coco-Glucoside, Glyceryl Oleate", "func": "Conditioning agent", "supplier": "BASF", "percent": 1.00 },
+    { "id": "8", "phase": "B", "tradeName": "Verdessence™ Xanthan", "inciName": "Xanthan Gum", "func": "Rheology modifier", "supplier": "BASF", "percent": 1.20 },
+    { "id": "9", "phase": "B", "tradeName": "Plantasil® Micro", "inciName": "Dicaprylyl Ether, Decyl Glucoside, Glyceryl Oleate", "func": "Conditioning agent", "supplier": "BASF", "percent": 3.00 },
+    { "id": "10", "phase": "B", "tradeName": "Sodium Benzoate", "inciName": "Sodium Benzoate", "func": "Preservative", "supplier": "Generic", "percent": 0.50 },
+    { "id": "11", "phase": "B", "tradeName": "Perfume Green Vanille Nat", "inciName": "Parfum", "func": "Fragrance", "supplier": "Düllberg Konzentra", "percent": 0.30 },
+    { "id": "12", "phase": "C", "tradeName": "Citric Acid (50% solution)", "inciName": "Citric Acid", "func": "pH Adjustment", "supplier": "BASF", "percent": 3.15 }
+  ],
+  "performanceData": [
+    { "id": "perf1", "parameter": "pH value (23°C)", "value": "4.9" },
+    { "id": "perf2", "parameter": "Viscosity (Brookfield; RVT; spindle 4; 10 rpm; 23°C)", "value": "11000 mPa·s" }
+  ],
+  "stabilityData": [
+    {
+      "id": "stab1",
+      "condition": "3 Months @ 25°C, 40°C",
+      "result": "Passed. Assumed based on standard industry practice for such formulations. No significant changes expected."
+    },
+    {
+      "id": "stab2",
+      "condition": "3 Freeze/Thaw Cycles (-5°C / +25°C)",
+      "result": "Passed. Assumed based on standard industry practice. No phase separation expected."
+    }
+  ],
+  "equipment": [
+    { "id": "eq1", "shortName": "V-401", "fullName": "Main Processing Vessel (150L)", "notes": "Stainless steel vessel with a variable-speed anchor or paddle stirrer." },
+    { "id": "eq2", "shortName": "P-401", "fullName": "Premix Vessel (50L)", "notes": "Vessel for premixing Plantacare 818 and Verdessence Xanthan." },
+    { "id": "eq3", "shortName": "QC-PH-04", "fullName": "Calibrated pH-meter", "notes": "For final pH measurement and adjustment." },
+    { "id": "eq4", "shortName": "QC-VISC-04", "fullName": "Brookfield RVT Viscometer", "notes": "For final product viscosity measurement." }
+  ],
+  "processSteps": [
+    { "id": "p1", "number": "1", "description": "In the main vessel, add the ingredients of Phase A (Water, Dehyquart Guar N, Citric Acid) in the given order while stirring. Allow the mixture to swell for 10 minutes.", "equipment": "V-401", "parameters": [{ "id": "param_swell_time", "name": "Swelling Time", "norm": "10 min" }] },
+    { "id": "p2", "number": "2", "description": "In a separate vessel, premix Plantacare 818 and Verdessence Xanthan from Phase B.", "equipment": "P-401", "parameters": [] },
+    { "id": "p3", "number": "3", "description": "Add the premix from step 2 and the remaining ingredients of Phase B to Phase A in the main vessel. Stir after each addition until the batch is completely homogeneous.", "equipment": "V-401", "parameters": [{ "id": "param_stir_B", "name": "Stirring Speed", "norm": "60-90 rpm" }] },
+    { "id": "p4", "number": "4", "description": "Check the pH of the batch. Adjust the pH value to the target with Phase C (Citric Acid). Mix well.", "equipment": "V-401, QC-PH-04", "parameters": [{ "id": "param_ph", "name": "Target pH", "norm": "4.8 - 5.0" }] }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        { "id": "qcc0", "parameter": "Appearance", "standard": "Homogeneous, pearlescent, viscous liquid" },
+        { "id": "qcc_odor", "parameter": "Odor", "standard": "Characteristic (Green Vanille)" },
+        { "id": "qcc1", "parameter": "pH value (23°C)", "standard": "4.8 - 5.0" },
+        { "id": "qcc2", "parameter": "Viscosity (Brookfield; RVT; spindle 4; 10 rpm; 23°C)", "standard": "10000 - 12000 mPa·s" },
+        { "id": "qcc_micro", "parameter": "Microbiological Purity", "standard": "No microbiological testing was carried out as per document. Standard: Complies with ISO 17516:2014 (Category 2)." }
+      ]
+    }
+  ]
+}

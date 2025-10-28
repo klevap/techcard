@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "productName": "Conditioning shampoo",
+    "productCode": "CPF 4309",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "Dow",
+    "batchSize": 100,
+    "description": "A conditioning shampoo featuring UCARE™ Extreme Polymer for effective conditioning. The formula is designed for good dispersion and is heated during processing to ensure homogeneity of all ingredients."
+  },
+  "ingredients": [
+    { "id": "1", "phase": "A", "tradeName": "Calfoam ES-303", "inciName": "Sodium Lauryl Ether Sulfate (30% active)", "func": "Anionic Surfactant", "supplier": "Pilot Chemical", "percent": 30.00 },
+    { "id": "2", "phase": "A", "tradeName": "Deionized water", "inciName": "Water / Aqua", "func": "Solvent", "supplier": "In-house", "percent": 60.00 },
+    { "id": "3", "phase": "A", "tradeName": "UCARE™ Extreme Polymer", "inciName": "Polyquaternium-10", "func": "Conditioning Agent", "supplier": "Dow", "percent": 0.30 },
+    { "id": "4", "phase": "A", "tradeName": "VERSENE™ 220 Crystals Chelating Agent", "inciName": "Tetrasodium EDTA", "func": "Chelating Agent", "supplier": "Dow", "percent": 0.20 },
+    { "id": "5", "phase": "B", "tradeName": "Incromide CMEA", "inciName": "Cocamide MEA", "func": "Thickener / Foam Booster", "supplier": "Croda", "percent": 2.00 },
+    { "id": "6", "phase": "B", "tradeName": "Mackam C-37", "inciName": "Cocamidopropyl Betaine (30% active)", "func": "Amphoteric Surfactant", "supplier": "Solvay", "percent": 7.00 },
+    { "id": "7", "phase": "C", "tradeName": "Neolone PH100 Preservative", "inciName": "Phenoxyethanol", "func": "Preservative", "supplier": "DuPont", "percent": 0.50 },
+    { "id": "8", "phase": "D", "tradeName": "Sodium Chloride", "inciName": "Sodium Chloride", "func": "Viscosity Modifier", "supplier": "Generic", "notes": "q.s.", "percent": 1.00 }
+  ],
+  "performanceData": [
+    { "id": "perf1", "parameter": "Appearance", "value": "Viscous Liquid (Typically pearlescent due to Cocamide MEA)" },
+    { "id": "perf2", "parameter": "pH", "value": "5.5 - 6.5 (Estimated typical range for this type of shampoo)" },
+    { "id": "perf3", "parameter": "Viscosity", "value": "5000 - 10000 cP (Estimated typical range)" }
+  ],
+  "stabilityData": [
+    {
+      "id": "stab1",
+      "condition": "3 Months @ RT, 40°C",
+      "result": "Passed. Assumed based on standard industry practice. No significant changes expected."
+    },
+    {
+      "id": "stab2",
+      "condition": "3 Freeze/Thaw Cycles",
+      "result": "Passed. Assumed based on standard industry practice. No phase separation expected."
+    }
+  ],
+  "equipment": [
+    { "id": "eq1", "shortName": "V-601", "fullName": "Main Processing Vessel (150L)", "notes": "Jacketed stainless steel vessel with a propeller or anchor stirrer for heating, mixing, and cooling." },
+    { "id": "eq2", "shortName": "QC-PH-06", "fullName": "Calibrated pH-meter", "notes": "For in-process pH checks." },
+    { "id": "eq3", "shortName": "QC-VISC-06", "fullName": "Brookfield Viscometer", "notes": "For final viscosity adjustment." }
+  ],
+  "processSteps": [
+    { "id": "p1", "number": "1", "description": "In the main vessel, slowly mix the Phase A ingredients in the order listed (Calfoam, Water, UCARE Polymer, VERSENE). Ensure good dispersion between each addition.", "equipment": "V-601", "parameters": [{ "id": "param_stir_A", "name": "Stirring Speed", "norm": "Slow to moderate" }] },
+    { "id": "p2", "number": "2", "description": "Start heating the batch to 80°C. Once at temperature, add the Phase B ingredients (Incromide CMEA, Mackam C-37) in order. Mix for an additional 10 minutes.", "equipment": "V-601", "parameters": [{ "id": "param_temp_B", "name": "Temperature", "norm": "80°C" }, { "id": "param_time_B", "name": "Mixing Time", "norm": "10 min" }] },
+    { "id": "p3", "number": "3", "description": "Turn off heating and start cooling the batch down to room temperature.", "equipment": "V-601", "parameters": [] },
+    { "id": "p4", "number": "4", "description": "When the temperature is below 40°C, add the Phase C ingredient (Neolone PH100). Mix until uniform.", "equipment": "V-601", "parameters": [{ "id": "param_cool", "name": "Cooling Temperature", "norm": "< 40°C" }] },
+    { "id": "p5", "number": "5", "description": "Add Phase D ingredient (Sodium Chloride) in portions to adjust the final viscosity to the target range.", "equipment": "V-601, QC-VISC-06", "parameters": [] },
+    { "id": "p6", "number": "6", "description": "Mix for an additional 10 minutes to ensure the batch is completely homogeneous.", "equipment": "V-601", "parameters": [{ "id": "param_final_mix", "name": "Final Mix Time", "norm": "10 min" }] }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        { "id": "qcc0", "parameter": "Appearance", "standard": "Homogeneous, viscous liquid" },
+        { "id": "qcc_odor", "parameter": "Odor", "standard": "Characteristic (if fragrance added)" },
+        { "id": "qcc1", "parameter": "pH value (25°C)", "standard": "5.5 - 6.5" },
+        { "id": "qcc2", "parameter": "Viscosity (Brookfield, 25°C)", "standard": "5000 - 10000 cP" },
+        { "id": "qcc_micro", "parameter": "Microbiological Purity", "standard": "Complies with ISO 17516:2014 (Category 2)" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "productName": "High Powered Delicate Shampoo",
+    "productCode": "SH-0150",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "Lubrizol",
+    "batchSize": 100,
+    "description": "A gentle cleansing shampoo with a light conditioning effect. It features a gentle cleansing base with boosted foam properties and effective conditioning from a polymer blend. The rheology is supported by Novethix™ L-10 polymer, resulting in a white, viscous, pearlescent liquid."
+  },
+  "ingredients": [
+    { "id": "1", "phase": "A", "tradeName": "Deionized Water", "inciName": "Deionized Water", "func": "Diluent", "supplier": "In-house", "percent": 41.41 },
+    { "id": "2", "phase": "A", "tradeName": "Novethix™ L-10 Polymer (30%TS)", "inciName": "Acrylates/Beheneth-25 Methacrylate Copolymer", "func": "Rheology Modifier", "supplier": "Lubrizol", "percent": 6.00 },
+    { "id": "3", "phase": "A", "tradeName": "Versene™ NA", "inciName": "Disodium EDTA", "func": "Chelating Agent", "supplier": "Dow Chemical", "percent": 0.10 },
+    { "id": "4", "phase": "A", "tradeName": "Zemea™ Propanediol", "inciName": "Propanediol", "func": "Humectant", "supplier": "DuPont, Tate and Lyle", "percent": 0.50 },
+    { "id": "5", "phase": "A", "tradeName": "Chemccinate™ DSLS-BA Surfactant (39%TS)", "inciName": "Disodium Laureth Sulfosuccinate", "func": "Surfactant", "supplier": "Lubrizol", "percent": 25.60 },
+    { "id": "6", "phase": "A", "tradeName": "Chembetaine™ CAD Surfactant (35%TS)", "inciName": "Cocamidopropyl Betaine", "func": "Surfactant", "supplier": "Lubrizol", "percent": 13.42 },
+    { "id": "7", "phase": "A", "tradeName": "Quickpearl™ PK3 Pearlizing Agent (40%TS)", "inciName": "Glycol Distearate (and) Laureth-4 (and) Cocamidopropyl Betaine", "func": "Pearlizing Agent", "supplier": "Lubrizol", "percent": 3.00 },
+    { "id": "8", "phase": "A", "tradeName": "Amidex™ CIPA Surfactant (100%TS)", "inciName": "Cocamide MIPA", "func": "Surfactant", "supplier": "Lubrizol", "percent": 1.20 },
+    { "id": "9", "phase": "B", "tradeName": "Merquat™ 100 Polymer (40%TS)", "inciName": "Polyquaternium-6", "func": "Conditioner", "supplier": "Lubrizol", "percent": 0.40 },
+    { "id": "10", "phase": "B", "tradeName": "Merquat™ 2003PR Polymer (21%TS)", "inciName": "Polyquaternium-53", "func": "Conditioner", "supplier": "Lubrizol", "percent": 0.40 },
+    { "id": "11", "phase": "B", "tradeName": "Chembetaine™ CAD Surfactant (35%TS)", "inciName": "Cocamidopropyl Betaine", "func": "Surfactant", "supplier": "Lubrizol", "percent": 4.00 },
+    { "id": "12", "phase": "C", "tradeName": "Protaquat™ CT-29 (30%TS)", "inciName": "Cetrimonium Chloride", "func": "Antistatic Agent", "supplier": "Protameen", "percent": 1.67 },
+    { "id": "13", "phase": "C", "tradeName": "Dowanol™ EPH Glycol Ether", "inciName": "Phenoxyethanol", "func": "Preservative", "supplier": "Dow Chemical", "percent": 0.50 },
+    { "id": "14", "phase": "C", "tradeName": "Fragrance Golden Fields WS", "inciName": "Fragrance", "func": "Fragrance", "supplier": "Lebermuth", "percent": 0.30 },
+    { "id": "15", "phase": "D", "tradeName": "Sodium Hydroxide (20%TS solution)", "inciName": "Sodium Hydroxide", "func": "Neutralizer", "supplier": "In-house", "notes": "approximate amount, QS to pH 6.3-7.0", "percent": 1.50 }
+  ],
+  "performanceData": [
+    { "id": "perf1", "parameter": "Appearance", "value": "White viscous pearlescent liquid" },
+    { "id": "perf2", "parameter": "pH", "value": "6.3 - 7.0" },
+    { "id": "perf3", "parameter": "Viscosity (Brookfield® RV, #6, 20 rpm, 1 min, 25°C)", "value": "14,000 - 20,000 mPa·s" }
+  ],
+  "stabilityData": [
+    { "id": "stab1", "condition": "In process @ RT and 45°C", "result": "Passed. Stable during processing." },
+    { "id": "stab2", "condition": "3 cycles freeze/thaw", "result": "Passed. No phase separation or crystallization observed." }
+  ],
+  "equipment": [
+    { "id": "eq1", "shortName": "V-301", "fullName": "Main Processing Vessel (150L)", "notes": "Jacketed stainless steel vessel with anchor stirrer for main mixing, heating, and cooling." },
+    { "id": "eq2", "shortName": "V-302", "fullName": "Premix Vessel (20L)", "notes": "Smaller vessel with propeller stirrer for preparing Part B." },
+    { "id": "eq3", "shortName": "QC-PH-03", "fullName": "Calibrated pH-meter", "notes": "For final pH measurement and adjustment." },
+    { "id": "eq4", "shortName": "QC-VISC-03", "fullName": "Brookfield RV Viscometer", "notes": "For final product viscosity measurement." }
+  ],
+  "processSteps": [
+    { "id": "p1", "number": "1", "description": "In the main vessel (V-301), blend items 1 (Water) and 2 (Novethix™ L-10 Polymer). Mix with moderate anchor stirring until uniform.", "equipment": "V-301", "parameters": [] },
+    { "id": "p2", "number": "2", "description": "Begin heating the main batch to 60°C with mixing. Add ingredients 3 through 7 one at a time in order, ensuring each is fully mixed before adding the next.", "equipment": "V-301", "parameters": [{ "id": "param_temp_A", "name": "Temperature", "norm": "60°C" }] },
+    { "id": "p3", "number": "3", "description": "When the batch is at 60°C, add item #8 (Amidex™ CIPA surfactant). Maintain temperature and mix for 1.5 hours after all solids are melted and dispersed.", "equipment": "V-301", "parameters": [{ "id": "param_time_A", "name": "Mixing Time", "norm": "1.5 hours" }] },
+    { "id": "p4", "number": "4", "description": "In a separate premix vessel (V-302), combine Part B ingredients (items 9, 10, 11). Mix until no sign of separation or ribboning is detected.", "equipment": "V-302", "parameters": [] },
+    { "id": "p5", "number": "5", "description": "Remove heat from the main batch and allow it to start cooling. Add the prepared Part B to the main batch with mixing. Mix until uniform.", "equipment": "V-301", "parameters": [] },
+    { "id": "p6", "number": "6", "description": "When the main batch has cooled below 30°C, add Part C ingredients (items 12-14) in order to the main batch. Mix until uniform.", "equipment": "V-301", "parameters": [{ "id": "param_cool", "name": "Cooling Temperature", "norm": "< 30°C" }] },
+    { "id": "p7", "number": "7", "description": "Check the pH. Adjust to 6.3 – 7.0 with Part D (NaOH 20% solution). Mix until uniform.", "equipment": "V-301, QC-PH-03", "parameters": [{ "id": "param_ph", "name": "Target pH", "norm": "6.3 - 7.0" }] }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        { "id": "qcc0", "parameter": "Appearance", "standard": "Homogeneous, white, viscous, pearlescent liquid" },
+        { "id": "qcc_odor", "parameter": "Odor", "standard": "Characteristic (Golden Fields WS)" },
+        { "id": "qcc1", "parameter": "pH value (25°C)", "standard": "6.3 - 7.0" },
+        { "id": "qcc2", "parameter": "Viscosity (Brookfield® RV; #6; 20 rpm; 1 min; 25°C)", "standard": "14,000 - 20,000 mPa·s" },
+        { "id": "qcc_micro", "parameter": "Microbiological Purity", "standard": "Complies with ISO 17516:2014 (Category 2)" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "meta": {
+    "productName": "PROFESSIONAL SHAMPOO",
+    "productCode": "C-171",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "Kao Corporation, S.A.",
+    "batchSize": 100,
+    "description": "A mild professional shampoo with good cleansing properties and an easy rinse-off. Formulated to be a clear, viscous liquid for salon use."
+  },
+  "ingredients": [
+    {
+      "id": "1",
+      "phase": "A",
+      "tradeName": "Deionized Water",
+      "inciName": "Aqua",
+      "func": "Solvent",
+      "supplier": "In-house",
+      "notes": "Up to 100",
+      "percent": 77.68
+    },
+    {
+      "id": "2",
+      "phase": "A",
+      "tradeName": "EMAL® 270D",
+      "inciName": "Sodium Laureth Sulfate",
+      "func": "Anionic Surfactant",
+      "supplier": "Kao",
+      "notes": "Primary surfactant, highly foaming.",
+      "percent": 17.0
+    },
+    {
+      "id": "3",
+      "phase": "B",
+      "tradeName": "AKYPO® RLM 100",
+      "inciName": "Laureth-11 Carboxylic acid",
+      "func": "Anionic Co-Surfactant",
+      "supplier": "Kao",
+      "notes": "Mild co-surfactant with solubilizing properties.",
+      "percent": 2.7
+    },
+    {
+      "id": "4",
+      "phase": "B",
+      "tradeName": "AMIDET® A 15",
+      "inciName": "Trideceth-2 Carboxamide MEA",
+      "func": "Non-ionic Surfactant",
+      "supplier": "Kao",
+      "notes": "Thickener and foam booster.",
+      "percent": 2.0
+    },
+    {
+      "id": "5",
+      "phase": "C",
+      "tradeName": "NaOH (50% solution)",
+      "inciName": "Sodium Hydroxide",
+      "func": "pH Adjuster",
+      "supplier": "Generic",
+      "notes": "Initial pH adjustment.",
+      "percent": 0.32
+    },
+    {
+      "id": "6",
+      "phase": "D",
+      "tradeName": "Perfume",
+      "inciName": "Parfum",
+      "func": "Fragrance",
+      "supplier": "Generic",
+      "notes": "q.s.",
+      "percent": 0.2
+    },
+    {
+      "id": "7",
+      "phase": "D",
+      "tradeName": "Preservative",
+      "inciName": "Preservative",
+      "func": "Preservative",
+      "supplier": "Generic",
+      "notes": "q.s.",
+      "percent": 0.1
+    },
+    {
+      "id": "8",
+      "phase": "E",
+      "tradeName": "NaOH (10% solution)",
+      "inciName": "Sodium Hydroxide",
+      "func": "pH Adjuster",
+      "supplier": "In-house",
+      "notes": "q.s. for final pH adjustment",
+      "percent": 0.5
+    },
+    {
+      "id": "9",
+      "phase": "F",
+      "tradeName": "Sodium Chloride",
+      "inciName": "Sodium Chloride",
+      "func": "Viscosity Modifier",
+      "supplier": "Generic",
+      "notes": "q.s. for viscosity adjustment",
+      "percent": 2.7
+    }
+  ],
+  "performanceData": [
+    {
+      "id": "perf1",
+      "parameter": "Appearance (20°C)",
+      "value": "Clear Viscous Liquid"
+    },
+    {
+      "id": "perf2",
+      "parameter": "pH (100%)",
+      "value": "6.0 - 7.0"
+    },
+    {
+      "id": "perf3",
+      "parameter": "Viscosity (Brookfield, 20°C, 2.7% NaCl)",
+      "value": "approx. 2000 cPs"
+    },
+    {
+      "id": "perf4",
+      "parameter": "Dry Matter (%)",
+      "value": "17"
+    }
+  ],
+  "stabilityData": [
+    {
+      "id": "stab1",
+      "condition": "1 month @ 40°C/RT/5°C",
+      "result": "Correct. No significant change in appearance, color, odor, pH, or viscosity."
+    }
+  ],
+  "equipment": [
+    {
+      "id": "eq1",
+      "shortName": "V-201",
+      "fullName": "Main Mixing Vessel (200L)",
+      "notes": "Jacketed stainless steel vessel with a variable-speed propeller stirrer for heating and mixing."
+    },
+    {
+      "id": "eq2",
+      "shortName": "QC-PH-02",
+      "fullName": "Calibrated pH-meter",
+      "notes": "For in-process and final pH measurement."
+    },
+    {
+      "id": "eq3",
+      "shortName": "QC-VISC-02",
+      "fullName": "Brookfield Viscometer",
+      "notes": "For final product viscosity measurement."
+    }
+  ],
+  "processSteps": [
+    {
+      "id": "p1",
+      "number": "1",
+      "description": "In the main vessel, add Deionized Water. Optionally, heat the water to 40-45°C to facilitate dissolution. Slowly add EMAL® 270D while stirring and continue mixing until the solution is completely transparent and homogeneous.",
+      "equipment": "V-201",
+      "parameters": [
+        {
+          "id": "param_temp_A",
+          "name": "Temperature",
+          "norm": "40-45°C (optional)"
+        },
+        {
+          "id": "param_stir_A",
+          "name": "Stirring Speed",
+          "norm": "50-70 rpm"
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "number": "2",
+      "description": "Add AKYPO® RLM 100 and AMIDET® A15. Stir after each addition until the mixture is homogeneous.",
+      "equipment": "V-201",
+      "parameters": []
+    },
+    {
+      "id": "p3",
+      "number": "3",
+      "description": "Add NaOH (50% solution) and begin cooling to room temperature. Check the pH and adjust if necessary using diluted sodium hydroxide or citric acid.",
+      "equipment": "V-201, QC-PH-02",
+      "parameters": [
+        {
+          "id": "param_ph_target",
+          "name": "Target pH",
+          "norm": "6.0 - 7.0"
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "number": "4",
+      "description": "Once below 35°C, add the remaining components (Preservative, Perfume). Homogenise after each addition.",
+      "equipment": "V-201",
+      "parameters": [
+        {
+          "id": "param_cool",
+          "name": "Cooling Temperature",
+          "norm": "< 35°C"
+        }
+      ]
+    },
+    {
+      "id": "p5",
+      "number": "5",
+      "description": "Adjust the final viscosity by adding Sodium Chloride in small portions until the target viscosity is reached. Mix well.",
+      "equipment": "V-201, QC-VISC-02",
+      "parameters": [
+        {
+          "id": "param_visc_target",
+          "name": "Target Viscosity",
+          "norm": "~2000 cPs"
+        }
+      ]
+    }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        {
+          "id": "qcc0",
+          "parameter": "Appearance (20°C)",
+          "standard": "Homogeneous, clear, viscous liquid"
+        },
+        {
+          "id": "qcc_odor",
+          "parameter": "Odor",
+          "standard": "Characteristic"
+        },
+        {
+          "id": "qcc1",
+          "parameter": "pH value (100%)",
+          "standard": "6.0 - 7.0"
+        },
+        {
+          "id": "qcc2",
+          "parameter": "Viscosity (Brookfield; 20°C)",
+          "standard": "1800 - 2200 cPs"
+        },
+        {
+          "id": "qcc_micro",
+          "parameter": "Microbiological Purity",
+          "standard": "Complies with ISO 17516:2014 (Category 2)"
+        }
+      ]
+    }
+  ]
+}

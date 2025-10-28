@@ -1,0 +1,299 @@
+{
+  "meta": {
+    "productName": "Naturally Mild Conditioning Shampoo",
+    "productCode": "HO105",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "Innospec",
+    "batchSize": 100,
+    "description": "An economical, naturally derived conditioning shampoo formulated at a low pH. It provides impressive flash foam and good conditioning performance through coacervation. The formulation is designed to build high viscosity for a rich user experience."
+  },
+  "ingredients": [
+    {
+      "id": "1",
+      "phase": "A",
+      "tradeName": "Water",
+      "inciName": "Aqua",
+      "func": "Solvent",
+      "supplier": "In-house",
+      "notes": "QS to 100%",
+      "percent": 61.50
+    },
+    {
+      "id": "2",
+      "phase": "A",
+      "tradeName": "Condicare PQ-10-4",
+      "inciName": "Polyquaternium-10",
+      "func": "Conditioning Agent",
+      "supplier": "Innospec",
+      "notes": "Cationic polymer for coacervation.",
+      "percent": 0.20
+    },
+    {
+      "id": "3",
+      "phase": "B",
+      "tradeName": "Pureact WS Conc",
+      "inciName": "Sodium Methyl Cocoyl Taurate",
+      "func": "Anionic Surfactant",
+      "supplier": "Innospec",
+      "notes": "Primary surfactant, provides foam.",
+      "percent": 9.40
+    },
+    {
+      "id": "4",
+      "phase": "B",
+      "tradeName": "Pureact Gluco L",
+      "inciName": "Lauryl Glucoside",
+      "func": "Non-ionic Surfactant",
+      "supplier": "Innospec",
+      "notes": "Mild co-surfactant, viscosity builder.",
+      "percent": 3.60
+    },
+    {
+      "id": "5",
+      "phase": "B",
+      "tradeName": "Pureact MS-CG",
+      "inciName": "Sodium Methyl Oleoyl Taurate",
+      "func": "Anionic Surfactant",
+      "supplier": "Innospec",
+      "notes": "Mild co-surfactant, viscosity builder.",
+      "percent": 3.60
+    },
+    {
+      "id": "6",
+      "phase": "B",
+      "tradeName": "Pureact LSR",
+      "inciName": "Sodium Lauroyl Sarcosinate",
+      "func": "Anionic Surfactant",
+      "supplier": "Innospec",
+      "notes": "Foaming and cleansing agent.",
+      "percent": 1.35
+    },
+    {
+      "id": "7",
+      "phase": "C",
+      "tradeName": "Surfac SB09 or Empigen HS/O",
+      "inciName": "Cocamidopropyl Hydroxysultaine",
+      "func": "Amphoteric Surfactant",
+      "supplier": "Surfachem / Innospec",
+      "notes": "Foam booster and thickener.",
+      "percent": 9.40
+    },
+    {
+      "id": "8",
+      "phase": "D",
+      "tradeName": "Sodium Benzoate",
+      "inciName": "Sodium Benzoate",
+      "func": "Preservative",
+      "supplier": "Generic",
+      "notes": "",
+      "percent": 0.50
+    },
+    {
+      "id": "9",
+      "phase": "E",
+      "tradeName": "Pomette",
+      "inciName": "Fragrance",
+      "func": "Fragrance",
+      "supplier": "Azur Fragrances",
+      "notes": "",
+      "percent": 0.50
+    },
+    {
+      "id": "10",
+      "phase": "F",
+      "tradeName": "Citric Acid (50%)",
+      "inciName": "Water (and) Citric Acid",
+      "func": "pH Adjuster",
+      "supplier": "In-house",
+      "notes": "QS to target pH",
+      "percent": 0.50
+    },
+    {
+      "id": "11",
+      "phase": "G",
+      "tradeName": "Sodium Chloride",
+      "inciName": "Sodium Chloride",
+      "func": "Viscosity Modifier",
+      "supplier": "Generic",
+      "notes": "Max 0.8%",
+      "percent": 0.80
+    }
+  ],
+  "performanceData": [
+    {
+      "id": "perf1",
+      "parameter": "Appearance",
+      "value": "Clear, Viscous Liquid"
+    },
+    {
+      "id": "perf2",
+      "parameter": "pH (25°C)",
+      "value": "4.2 - 4.7"
+    },
+    {
+      "id": "perf3",
+      "parameter": "Viscosity (Brookfield DV-E, 20 rpm, spindle 5, 25°C)",
+      "value": "4,500 – 8,000 cP"
+    }
+  ],
+  "stabilityData": [
+    {
+      "id": "stab1",
+      "condition": "12 weeks @ 5°C, 20°C, 45°C",
+      "result": "Passed. No significant change in appearance, color, odor, pH, or viscosity."
+    },
+    {
+      "id": "stab2",
+      "condition": "3 Freeze/Thaw Cycles",
+      "result": "Passed. No phase separation or crystallization observed."
+    }
+  ],
+  "equipment": [
+    {
+      "id": "eq1",
+      "shortName": "V-101",
+      "fullName": "Main Processing Vessel (150L)",
+      "notes": "Jacketed stainless steel vessel with a variable-speed anchor stirrer and vortex capabilities for powder dispersion."
+    },
+    {
+      "id": "eq2",
+      "shortName": "QC-PH-01",
+      "fullName": "Calibrated pH-meter",
+      "notes": "For in-process and final pH measurement and adjustment."
+    },
+    {
+      "id": "eq3",
+      "shortName": "QC-VISC-01",
+      "fullName": "Brookfield DV-E Viscometer",
+      "notes": "For final product viscosity measurement."
+    }
+  ],
+  "processSteps": [
+    {
+      "id": "p1",
+      "number": "1",
+      "description": "To the main vessel containing Part A water, create a vortex with the anchor stirrer. Slowly sprinkle in Condicare PQ-10-4. Continue mixing until fully dispersed and the solution is clear and free of lumps.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param_stir_A",
+          "name": "Stirring Speed",
+          "norm": "100-150 rpm"
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "number": "2",
+      "description": "Begin heating the batch to 40-45°C using the vessel jacket.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param_temp_B",
+          "name": "Temperature",
+          "norm": "40-45°C"
+        }
+      ]
+    },
+    {
+      "id": "p3",
+      "number": "3",
+      "description": "Sequentially add the ingredients of Part B to the main vessel. Mix well after each addition until the batch is uniform and clear.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param_stir_B",
+          "name": "Stirring Speed",
+          "norm": "60-80 rpm"
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "number": "4",
+      "description": "Slowly add Part C to the main vessel. Mix until uniform.",
+      "equipment": "V-101",
+      "parameters": []
+    },
+    {
+      "id": "p5",
+      "number": "5",
+      "description": "Turn off heating and begin cooling the batch to below 40°C. Once cooled, add Part D (Sodium Benzoate) and mix until fully dissolved and uniform.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param_cool",
+          "name": "Cooling Temperature",
+          "norm": "< 40°C"
+        }
+      ]
+    },
+    {
+      "id": "p6",
+      "number": "6",
+      "description": "Add Part E (Fragrance) and mix until uniform.",
+      "equipment": "V-101",
+      "parameters": []
+    },
+    {
+      "id": "p7",
+      "number": "7",
+      "description": "Check the pH of the batch. Adjust to the target range using Part F (Citric Acid 50%) as needed. Mix well after each addition.",
+      "equipment": "V-101, QC-PH-01",
+      "parameters": [
+        {
+          "id": "param_ph",
+          "name": "Target pH",
+          "norm": "4.2 - 4.7"
+        }
+      ]
+    },
+    {
+      "id": "p8",
+      "number": "8",
+      "description": "Check the viscosity. Add small increments of Part G (Sodium Chloride) up to a maximum of 0.8% to achieve the final target viscosity. Mix thoroughly until uniform.",
+      "equipment": "V-101, QC-VISC-01",
+      "parameters": [
+        {
+          "id": "param_visc",
+          "name": "Target Viscosity",
+          "norm": "4,500 - 8,000 cP"
+        }
+      ]
+    }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        {
+          "id": "qcc0",
+          "parameter": "Appearance",
+          "standard": "Homogeneous, clear, viscous liquid"
+        },
+        {
+          "id": "qcc_odor",
+          "parameter": "Odor",
+          "standard": "Characteristic, matching standard"
+        },
+        {
+          "id": "qcc1",
+          "parameter": "pH value (25°C)",
+          "standard": "4.2 - 4.7"
+        },
+        {
+          "id": "qcc2",
+          "parameter": "Viscosity (Brookfield; DV-E; spindle 5; 20 rpm; 25°C)",
+          "standard": "4,500 - 8,000 cP"
+        },
+        {
+          "id": "qcc_micro",
+          "parameter": "Microbiological Purity",
+          "standard": "Complies with ISO 17516:2014 (Category 2)"
+        }
+      ]
+    }
+  ]
+}
