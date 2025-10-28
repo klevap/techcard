@@ -1,0 +1,366 @@
+{
+  "meta": {
+    "productName": "CC Cream SWOP SPF 30",
+    "productCode": "SC-FR-18-011-G013",
+    "docVersion": "1.0",
+    "docDate": "2025-10-28",
+    "author": "R&D Department",
+    "batchSize": 100,
+    "description": "A multi-functional CC cream with a Switch-Over-Phase (SWOP) texture that transforms on application. It provides high broad-spectrum SPF 30 protection against UVA and UVB rays while offering color correction and a smooth, pleasant skin feel."
+  },
+  "ingredients": [
+    {
+      "id": "1",
+      "phase": "A",
+      "tradeName": "Dehymuls® PGPH",
+      "inciName": "Polyglyceryl-2 Dipolyhydroxystearate",
+      "func": "Emulsifier (W/O)",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 4
+    },
+    {
+      "id": "2",
+      "phase": "A",
+      "tradeName": "Eumulgin® Prisma",
+      "inciName": "Disodium Cetearyl Sulfosuccinate",
+      "func": "Emulsifier (O/W)",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 1
+    },
+    {
+      "id": "3",
+      "phase": "A",
+      "tradeName": "Cetiol® MM",
+      "inciName": "Myristyl Myristate",
+      "func": "Consistency agent",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 1.5
+    },
+    {
+      "id": "4",
+      "phase": "A",
+      "tradeName": "Cetiol® B",
+      "inciName": "Dibutyl Adipate",
+      "func": "Emollient",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 9
+    },
+    {
+      "id": "5",
+      "phase": "A",
+      "tradeName": "Cetiol® CC",
+      "inciName": "Dicaprylyl Carbonate",
+      "func": "Emollient",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 10
+    },
+    {
+      "id": "6",
+      "phase": "A",
+      "tradeName": "Tinosorb® S",
+      "inciName": "Bis-Ethylhexyloxyphenol Methoxyphenyl Triazine",
+      "func": "Broad spectrum UV filter",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 2
+    },
+    {
+      "id": "7",
+      "phase": "A",
+      "tradeName": "Uvinul® T 150",
+      "inciName": "Ethylhexyl Triazone",
+      "func": "UV-B filter",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 2
+    },
+    {
+      "id": "8",
+      "phase": "A",
+      "tradeName": "Cosmedia® SP",
+      "inciName": "Sodium Polyacrylate",
+      "func": "Rheology modifier",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 1
+    },
+    {
+      "id": "9",
+      "phase": "B",
+      "tradeName": "Water, demin.",
+      "inciName": "Aqua",
+      "func": "Solvent",
+      "supplier": "In-house",
+      "notes": "",
+      "percent": 41.5
+    },
+    {
+      "id": "10",
+      "phase": "B",
+      "tradeName": "1,3-Butanediol",
+      "inciName": "Butylene Glycol",
+      "func": "Humectant",
+      "supplier": "Interchimie",
+      "notes": "",
+      "percent": 3
+    },
+    {
+      "id": "11",
+      "phase": "C",
+      "tradeName": "Cetiol® Ultimate",
+      "inciName": "Undecane, Tridecane",
+      "func": "Emollient",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 5
+    },
+    {
+      "id": "12",
+      "phase": "D",
+      "tradeName": "Tinosorb® M",
+      "inciName": "Methylene Bis-Benzotriazolyl Tetramethylbutylphenol (nano), Aqua, Decyl Glucoside, Propylene Glycol, Xanthan Gum",
+      "func": "Broad spectrum UV filter",
+      "supplier": "BASF",
+      "notes": "",
+      "percent": 15
+    },
+    {
+      "id": "13",
+      "phase": "D",
+      "tradeName": "Orgasol 4000 EXD NAT COS Caresse",
+      "inciName": "Nylon-6/12",
+      "func": "Skin feel modifier",
+      "supplier": "Arkema",
+      "notes": "",
+      "percent": 2
+    },
+    {
+      "id": "14",
+      "phase": "D",
+      "tradeName": "Geogard 221",
+      "inciName": "Dehydroacetic Acid, Benzyl Alcohol",
+      "func": "Preservative",
+      "supplier": "Lonza",
+      "notes": "",
+      "percent": 1
+    },
+    {
+      "id": "15",
+      "phase": "D",
+      "tradeName": "Perfume",
+      "inciName": "Parfum",
+      "func": "Fragrance",
+      "supplier": "Technicoflor",
+      "notes": "0.50% Cabano One Rose RS32626",
+      "percent": "qs"
+    },
+    {
+      "id": "16",
+      "phase": "D",
+      "tradeName": "Pigment",
+      "inciName": "CI77891, Mannitol, CI77492, Hydrogenated glycerin, Polymethyl Methacrylate, Aluminium Hydroxide, CI77891",
+      "func": "Colorant",
+      "supplier": "Daito Kasei",
+      "notes": "Sugarcapsule Magic Brown SP",
+      "percent": 2
+    },
+    {
+      "id": "17",
+      "phase": "E",
+      "tradeName": "Sodium Hydroxide (25% solution)",
+      "inciName": "Sodium Hydroxide",
+      "func": "pH Adjustment",
+      "supplier": "In-house",
+      "notes": "q.s. to target pH",
+      "percent": "qs"
+    }
+  ],
+  "performanceData": [
+    {
+      "id": "perf1",
+      "parameter": "SPF in silico (BASF Sunscreen Simulator)",
+      "value": "34"
+    },
+    {
+      "id": "perf2",
+      "parameter": "UVA-PF in vitro (BASF internal method Nr. 55)",
+      "value": "12.3"
+    },
+    {
+      "id": "perf3",
+      "parameter": "Critical Wavelength (nm)",
+      "value": "378 nm"
+    }
+  ],
+  "stabilityData": [
+    {
+      "id": "stab1",
+      "condition": "3 Months @ 4°C, 25°C (Room Temperature), 40°C",
+      "result": "Passed. No significant change in color, odor, pH, viscosity, or phase separation."
+    },
+    {
+      "id": "stab2",
+      "condition": "1 Month @ -10°C, 50°C",
+      "result": "Passed. No significant change in color, odor, pH, viscosity, or phase separation."
+    },
+    {
+      "id": "stab3",
+      "condition": "3 Freeze/Thaw Cycles (-15°C / +25°C)",
+      "result": "Passed. No phase separation or crystallization observed."
+    },
+    {
+      "id": "stab4",
+      "condition": "Challenge test",
+      "result": "Passed (B Criteria)."
+    }
+  ],
+  "equipment": [
+    {
+      "id": "eq1",
+      "shortName": "V-101",
+      "fullName": "Main Processing Vessel (150L)",
+      "notes": "Jacketed stainless steel vessel with anchor stirrer and bottom-mounted homogenizer."
+    },
+    {
+      "id": "eq2",
+      "shortName": "V-102",
+      "fullName": "Water Phase Premix Vessel (100L)",
+      "notes": "Jacketed vessel with propeller stirrer for heating water phase ingredients."
+    },
+    {
+      "id": "eq3",
+      "shortName": "HOMO-1",
+      "fullName": "Rotor-Stator Homogenizer",
+      "notes": "High-shear device for creating fine and stable emulsions. Integrated into V-101."
+    },
+    {
+      "id": "eq4",
+      "shortName": "QC-PH-01",
+      "fullName": "Calibrated pH-meter",
+      "notes": "For in-process and final pH measurement and adjustment."
+    },
+    {
+      "id": "eq5",
+      "shortName": "QC-VISC-01",
+      "fullName": "Brookfield Viscometer DV-I+",
+      "notes": "For final product viscosity measurement."
+    }
+  ],
+  "processSteps": [
+    {
+      "id": "p1",
+      "number": "1",
+      "description": "In separate vessels, heat phases A and B to 80°C.",
+      "equipment": "V-101, V-102",
+      "parameters": [
+        {
+          "id": "param_temp_AB",
+          "name": "Temperature",
+          "norm": "80°C"
+        }
+      ]
+    },
+    {
+      "id": "p2",
+      "number": "2",
+      "description": "Slowly add phase A into phase B under stirring. The emulsion will turn into a gel.",
+      "equipment": "V-101",
+      "parameters": []
+    },
+    {
+      "id": "p3",
+      "number": "3",
+      "description": "Begin cooling down with gentle stirring.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param1",
+          "name": "Stirring Speed",
+          "norm": "200 rpm"
+        }
+      ]
+    },
+    {
+      "id": "p4",
+      "number": "4",
+      "description": "At 60°C, add Cetiol Ultimate (Phase C) under high shear stirring.",
+      "equipment": "V-101, HOMO-1",
+      "parameters": [
+        {
+          "id": "param_temp_C",
+          "name": "Addition Temperature",
+          "norm": "60°C"
+        },
+        {
+          "id": "param_stir_C",
+          "name": "Stirring Speed",
+          "norm": "1000 rpm"
+        }
+      ]
+    },
+    {
+      "id": "p5",
+      "number": "5",
+      "description": "At room temperature (below 30°C), add the ingredients of phase D one after the other, ensuring each is fully incorporated before adding the next.",
+      "equipment": "V-101",
+      "parameters": [
+        {
+          "id": "param_temp_D",
+          "name": "Addition Temperature",
+          "norm": "< 30°C"
+        }
+      ]
+    },
+    {
+      "id": "p6",
+      "number": "6",
+      "description": "Check the pH of the batch. Adjust the pH to 6.5 with phase E.",
+      "equipment": "V-101, QC-PH-01",
+      "parameters": [
+        {
+          "id": "param_ph",
+          "name": "Target pH",
+          "norm": "6.4 - 6.8"
+        }
+      ]
+    }
+  ],
+  "qualityControl": [
+    {
+      "id": "qc1",
+      "name": "Final Product Specifications",
+      "checks": [
+        {
+          "id": "qcc0",
+          "parameter": "Appearance",
+          "standard": "Homogeneous, light brown cream"
+        },
+        {
+          "id": "qcc_odor",
+          "parameter": "Odor",
+          "standard": "Characteristic floral rose scent"
+        },
+        {
+          "id": "qcc1",
+          "parameter": "pH value (20°C)",
+          "standard": "6.4 - 6.8"
+        },
+        {
+          "id": "qcc2",
+          "parameter": "Viscosity (Brookfield; DV-I+; spindle 5; 10 rpm; 20°C)",
+          "standard": "18000 - 22000 mPa·s"
+        },
+        {
+          "id": "qcc_micro",
+          "parameter": "Microbiological Purity",
+          "standard": "Complies with ISO 17516:2014 (Category 2)"
+        }
+      ]
+    }
+  ]
+}
