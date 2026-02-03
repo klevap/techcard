@@ -30,19 +30,19 @@ export const debounce = (func, wait) => {
  */
 export const autoExpand = (textarea) => {
     if (!textarea || textarea.tagName !== 'TEXTAREA') return;
-    
-    // Reset height to a small value to allow shrinking and correct scrollHeight calc
     textarea.style.height = '1px';
-    
-    // Set new height based on scrollHeight
-    // Adding a small buffer (2px) for borders
     textarea.style.height = (textarea.scrollHeight + 2) + 'px';
 };
 
 /**
- * Enable column resizing for a table using "Neighbor Resize" logic.
- * This ensures the table width remains fixed at 100% and the right boundary doesn't shift.
- * Resizing column [i] affects column [i] and [i+1].
+ * Enable column resizing for a table using COLGROUP.
+ * This is the robust way to handle tables with colspan rows (like Formulation).
+ * 
+ * Logic:
+ * 1. Manipulates <col> widths instead of <th> widths.
+ * 2. Ignores hidden columns (like .print-only).
+ * 3. The LAST VISIBLE column is left with 'auto' width to fill the table (100%).
+ * 4. Resizing affects Current Column and Next Visible Column.
  * 
  * @param {HTMLElement} table - The table element
  * @param {Object} store - The application store instance
@@ -51,22 +51,47 @@ export const setupColumnResize = (table, store) => {
     if (!table || !table.id) return;
 
     const tableId = table.id;
-    const headers = Array.from(table.querySelectorAll('th'));
-    const state = store.getState();
-    const savedWidths = state.columnWidths && state.columnWidths[tableId] ? state.columnWidths[tableId] : {};
-    const MIN_WIDTH = 40;
+    const colgroup = table.querySelector('colgroup');
+    if (!colgroup) return; // Should not happen with new HTML
 
-    // Apply saved widths initially
+    const cols = Array.from(colgroup.querySelectorAll('col'));
+    const headers = Array.from(table.querySelectorAll('thead th'));
+    
+    // Map visible headers to their corresponding <col> elements
+    // We filter headers by visibility, but we need to keep track of their original index
+    // to target the correct <col>.
+    const visibleColumns = [];
     headers.forEach((th, index) => {
-        if (savedWidths[index]) {
-            th.style.width = savedWidths[index];
+        if (getComputedStyle(th).display !== 'none') {
+            visibleColumns.push({
+                header: th,
+                col: cols[index],
+                index: index
+            });
         }
     });
 
-    headers.forEach((th, index) => {
-        // Don't add handle to the last column
-        if (index === headers.length - 1) return;
+    const state = store.getState();
+    const savedWidths = state.columnWidths && state.columnWidths[tableId] ? state.columnWidths[tableId] : {};
+    const MIN_WIDTH = 50;
 
+    // Apply saved widths
+    // IMPORTANT: Skip the last visible column to ensure it remains fluid (fills gap)
+    visibleColumns.forEach((item, i) => {
+        if (i === visibleColumns.length - 1) {
+            item.col.style.width = ''; // Force auto
+        } else if (savedWidths[item.index]) {
+            item.col.style.width = savedWidths[item.index];
+        }
+    });
+
+    // Add Resize Handles to Headers
+    visibleColumns.forEach((item, i) => {
+        // Don't add handle to the last visible column
+        if (i === visibleColumns.length - 1) return;
+
+        const th = item.header;
+        
         // Skip if handle already exists
         if (th.querySelector('.resize-handle')) return;
 
@@ -79,40 +104,46 @@ export const setupColumnResize = (table, store) => {
             e.stopPropagation();
             
             const startX = e.pageX;
-            const currentHeader = th;
-            const nextHeader = headers[index + 1];
             
-            const startWidthCurrent = currentHeader.offsetWidth;
-            const startWidthNext = nextHeader.offsetWidth;
+            const currentCol = item.col;
+            // The next visible column might not be the immediate next index if some are hidden
+            const nextCol = visibleColumns[i + 1].col; 
+            
+            // We need pixel widths. Since <col> might not have offsetWidth, 
+            // we use the corresponding header's width as a proxy for the start value.
+            const startWidthCurrent = item.header.offsetWidth;
+            const startWidthNext = visibleColumns[i + 1].header.offsetWidth;
             
             document.body.classList.add('resizing');
 
             const onMouseMove = (e) => {
                 requestAnimationFrame(() => {
-                    const currentX = e.pageX;
-                    const delta = currentX - startX;
+                    const delta = e.pageX - startX;
                     
-                    // Calculate new widths
-                    // If delta > 0 (Right): Current grows, Next shrinks
-                    // If delta < 0 (Left): Current shrinks, Next grows
+                    // Logic:
+                    // Current gets +delta
+                    // Next gets -delta
+                    // We must constrain delta so neither goes below MIN_WIDTH
                     
-                    let newWidthCurrent = startWidthCurrent + delta;
-                    let newWidthNext = startWidthNext - delta;
+                    // Max we can grow current = Next width - MIN
+                    const maxGrow = startWidthNext - MIN_WIDTH;
+                    // Max we can shrink current = Current width - MIN
+                    const maxShrink = startWidthCurrent - MIN_WIDTH;
 
-                    // Enforce minimum widths
-                    if (newWidthCurrent < MIN_WIDTH) {
-                        newWidthCurrent = MIN_WIDTH;
-                        newWidthNext = startWidthNext + (startWidthCurrent - MIN_WIDTH);
-                    } else if (newWidthNext < MIN_WIDTH) {
-                        newWidthNext = MIN_WIDTH;
-                        newWidthCurrent = startWidthCurrent + (startWidthNext - MIN_WIDTH);
+                    let constrainedDelta = delta;
+                    if (constrainedDelta > maxGrow) constrainedDelta = maxGrow;
+                    if (constrainedDelta < -maxShrink) constrainedDelta = -maxShrink;
+
+                    currentCol.style.width = `${startWidthCurrent + constrainedDelta}px`;
+                    
+                    // Only set explicit width on Next if it is NOT the last visible column.
+                    // If Next IS the last visible column, we leave it as 'auto' (implicit)
+                    // so it absorbs the change naturally.
+                    if (i + 1 !== visibleColumns.length - 1) {
+                        nextCol.style.width = `${startWidthNext - constrainedDelta}px`;
                     }
 
-                    // Apply widths
-                    currentHeader.style.width = `${newWidthCurrent}px`;
-                    nextHeader.style.width = `${newWidthNext}px`;
-
-                    // Trigger auto-expand for all textareas in the table
+                    // Trigger auto-expand for textareas
                     const textareas = table.querySelectorAll('textarea');
                     textareas.forEach(ta => autoExpand(ta));
                 });
@@ -123,9 +154,14 @@ export const setupColumnResize = (table, store) => {
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
                 
-                // Save all widths to store
-                headers.forEach((h, i) => {
-                    store.setColumnWidth(tableId, i, h.style.width);
+                // Save widths
+                visibleColumns.forEach((vc, idx) => {
+                    // Don't save width for the last visible column
+                    if (idx === visibleColumns.length - 1) {
+                        store.setColumnWidth(tableId, vc.index, '');
+                    } else {
+                        store.setColumnWidth(tableId, vc.index, vc.col.style.width);
+                    }
                 });
             };
 

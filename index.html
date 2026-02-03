@@ -82,8 +82,20 @@
             <div class="box"><span class="muted" data-i18n="totalPercent">Сумма %:</span> <strong id="sumPercent">0.00%</strong></div>
         </div>
         <table id="formTable">
+            <!-- COLGROUP: The fix for resize stability -->
+            <colgroup>
+                <col style="width: 60px;"> <!-- Phase -->
+                <col class="trade-col">
+                <col class="inci-col">
+                <col class="func-col">
+                <col class="supplier-col">
+                <col class="notes-col">
+                <col style="width: 70px;"> <!-- Percent -->
+                <col style="width: 80px;"> <!-- Mass -->
+                <col class="no-print" style="width: 40px;"> <!-- Actions -->
+                <col class="print-only"> <!-- Actual Mass -->
+            </colgroup>
             <thead><tr>
-                <!-- Removed inline widths to allow 100% fill and proper resizing -->
                 <th data-i18n="phase">Фаза</th>
                 <th class="trade-col" data-i18n="tradeName">Торг. название</th>
                 <th class="inci-col" data-i18n="inciName">INCI</th>
@@ -92,7 +104,7 @@
                 <th class="notes-col" data-i18n="notes">Примечания</th>
                 <th data-i18n="percent">%</th>
                 <th data-i18n="mass">Загрузка, кг</th>
-                <th class="no-print"></th> <!-- Actions header empty -->
+                <th class="no-print"></th>
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
             </tr></thead>
             <tbody id="formBody"></tbody>
@@ -104,6 +116,11 @@
     <div class="card performance-card">
         <h2 data-i18n="performance">Технические параметры</h2>
         <table id="perfTable">
+            <colgroup>
+                <col> <!-- Parameter -->
+                <col> <!-- Value -->
+                <col class="no-print" style="width: 40px;"> <!-- Actions -->
+            </colgroup>
             <thead><tr>
                 <th data-i18n="perfParam">Параметр</th>
                 <th data-i18n="perfValue">Значение</th>
@@ -118,6 +135,11 @@
     <div class="card stability-card">
         <h2 data-i18n="stability">Данные о стабильности</h2>
         <table id="stabTable">
+            <colgroup>
+                <col> <!-- Condition -->
+                <col> <!-- Result -->
+                <col class="no-print" style="width: 40px;"> <!-- Actions -->
+            </colgroup>
             <thead><tr>
                 <th data-i18n="stabCondition">Условие</th>
                 <th data-i18n="stabResult">Результат</th>
@@ -132,6 +154,12 @@
     <div class="card">
         <h2 data-i18n="equipmentList">Список оборудования</h2>
         <table id="equipmentTable">
+            <colgroup>
+                <col style="width: 100px;"> <!-- ID -->
+                <col> <!-- Name -->
+                <col> <!-- Notes -->
+                <col class="no-print" style="width: 40px;"> <!-- Actions -->
+            </colgroup>
             <thead><tr>
                 <th data-i18n="eqShortName">ID / Код</th>
                 <th data-i18n="eqFullName">Полное наименование</th>
@@ -147,13 +175,22 @@
     <div class="card">
         <h2 data-i18n="process">Технологический процесс</h2>
         <table id="procTable">
+            <colgroup>
+                <col style="width: 40px;"> <!-- Step -->
+                <col> <!-- Description -->
+                <col> <!-- Equipment -->
+                <col> <!-- Param Name -->
+                <col> <!-- Norm -->
+                <col class="no-print" style="width: 60px;"> <!-- Actions -->
+                <col class="print-only"> <!-- Actual -->
+            </colgroup>
             <thead><tr>
                 <th data-i18n="step">№</th>
                 <th data-i18n="opDescription">Описание операции</th>
                 <th data-i18n="equipment">Оборудование</th>
                 <th data-i18n="paramName">Параметр процесса</th>
                 <th data-i18n="norm">Норма</th>
-                <th class="no-print"></th> <!-- Actions for Parameters -->
+                <th class="no-print"></th>
                 <th class="print-only" data-i18n="actual">Факт</th>
             </tr></thead>
             <tbody id="procBody"></tbody>
@@ -244,7 +281,7 @@
         <td class="step-description" style="vertical-align: middle;">
             <textarea class="data-field" data-key="description" rows="2"></textarea>
             <div class="print-content" data-key="description-print"></div>
-            <!-- Delete Step Button moved here for clarity -->
+            <!-- Delete Step Button -->
             <button class="btn icon-btn step-delete-btn delBtn" title="Delete Step">✕</button>
         </td>
         <td class="step-equipment" style="vertical-align: middle;">
@@ -278,11 +315,17 @@
             <button class="btn icon-btn delQcBtn no-print" title="Delete block">✕</button>
         </div>
         <table>
+            <colgroup>
+                <col>
+                <col>
+                <col>
+                <col class="no-print" style="width: 50px;">
+            </colgroup>
             <thead><tr>
                 <th data-i18n="qcParamName">Наименование показателя</th>
                 <th data-i18n="qcStandard">Норматив</th>
                 <th data-i18n="qcResult">Результат</th>
-                <th style="width: 50px;" class="no-print"></th>
+                <th class="no-print"></th>
             </tr></thead>
             <tbody></tbody>
         </table>

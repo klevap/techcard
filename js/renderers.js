@@ -48,7 +48,13 @@ export const renderIngredients = (state) => {
             const tr = document.createElement('tr');
             tr.className = 'phase-header';
             const td = document.createElement('td');
-            td.colSpan = 10;
+            
+            // DYNAMIC COLSPAN CALCULATION
+            // This ensures the phase header spans the correct number of columns
+            // regardless of hidden columns or HTML changes.
+            const headerCells = document.querySelectorAll('#formTable thead th');
+            td.colSpan = headerCells.length || 10; 
+            
             td.textContent = `${t('phaseHeader')} ${currentPhase}`;
             tr.appendChild(td);
             tbody.appendChild(tr);
