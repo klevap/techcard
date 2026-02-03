@@ -14,7 +14,20 @@ const getInitialState = () => ({
     equipment: [],
     processSteps: [],
     qualityControl: [],
-    columnWidths: {} // Stores { tableId: { colIndex: width } }
+    // Default column widths in pixels for better fixed layout control
+    columnWidths: {
+        'formTable': {
+            0: '60px',  // Phase
+            1: '200px', // Trade Name
+            2: '200px', // INCI
+            3: '150px', // Function
+            4: '120px', // Supplier
+            5: '150px', // Notes
+            6: '70px',  // %
+            7: '80px',  // Mass
+            8: '40px'   // Actions
+        }
+    } 
 });
 
 class Store {
@@ -40,10 +53,20 @@ class Store {
         };
         
         // Migration logic: ensure tradeName exists if name was used
+        // Also handle "qs" in percent field from examples
         normalized.ingredients.forEach(ing => {
             if (ing.name && !ing.tradeName) {
                 ing.tradeName = ing.name;
                 delete ing.name;
+            }
+            
+            // Handle non-numeric percent values like "qs"
+            if (typeof ing.percent === 'string' && isNaN(parseFloat(ing.percent))) {
+                const val = ing.percent.trim();
+                if (val.toLowerCase() === 'qs' || val !== '') {
+                    ing.notes = (ing.notes ? ing.notes + '\n' : '') + `Percent: ${val}`;
+                }
+                ing.percent = 0;
             }
         });
         return normalized;

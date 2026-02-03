@@ -46,10 +46,23 @@ document.addEventListener('DOMContentLoaded', () => {
         const exampleLoader = $('#exampleLoader');
         if (exampleLoader.value !== "") exampleLoader.value = "";
 
+        // Generic Print Update for Textareas
+        if (target.tagName === 'TEXTAREA') {
+            // Try to find a sibling or parent's child with the matching print key
+            // Usually it's a sibling in the same cell
+            const parent = target.parentElement;
+            const printEl = parent ? parent.querySelector(`[data-key="${key}-print"]`) : null;
+            if (printEl) printEl.textContent = value;
+            
+            // Also handle description specifically if needed (it's outside a table)
+            if (key === 'description') $('#description-print').textContent = value;
+            
+            autoExpand(target);
+        }
+
         // Meta fields
         if (state.meta.hasOwnProperty(key)) {
             state.meta[key] = value;
-            if (key === 'description') $('#description-print').textContent = value;
             if (key === 'batchSize') Renderers.renderIngredients(state); // Re-calc mass
         }
 
@@ -59,10 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = state.ingredients.find(i => i.id == ingRow.dataset.id);
             if (item) {
                 item[key] = value;
-                if (target.tagName === 'TEXTAREA') {
-                    const printEl = ingRow.querySelector(`[data-key="${key}-print"]`);
-                    if(printEl) printEl.textContent = value;
-                }
                 if (key === 'percent') {
                     const batchSize = parseFloat(state.meta.batchSize) || 0;
                     ingRow.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(value) || 0) / 100).toFixed(3);
@@ -85,13 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const equipRow = target.closest('#equipmentBody tr[data-id]');
         if (equipRow) {
             const item = state.equipment.find(i => i.id == equipRow.dataset.id);
-            if (item) {
-                item[key] = value;
-                if (target.tagName === 'TEXTAREA') {
-                    const printEl = equipRow.querySelector(`[data-key="${key}-print"]`);
-                    if(printEl) printEl.textContent = value;
-                }
-            }
+            if (item) item[key] = value;
         }
 
         // Process
@@ -105,10 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (param) param[key] = value;
                 } else {
                     step[key] = value;
-                    if (target.tagName === 'TEXTAREA') {
-                        const printEl = procRow.querySelector(`[data-key="${key}-print"]`);
-                        if(printEl) printEl.textContent = value;
-                    }
                 }
             }
         }
@@ -127,9 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-
-        // Auto expand textareas
-        if (target.tagName.toLowerCase() === 'textarea') autoExpand(target);
 
         // Persist silently
         store.saveToStorage();
@@ -275,7 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $('#printBtn').addEventListener('click', () => {
         const state = store.getState();
-        document.body.classList.toggle('print-force-hide-description', !state.meta.description?.trim());
+        // Check DOM value directly to avoid debounce issues
+        const hasDesc = ($('#description')?.value || '').trim().length > 0;
+        
+        document.body.classList.toggle('print-force-hide-description', !hasDesc);
         document.body.classList.toggle('print-force-hide-performance', state.performanceData.length === 0);
         document.body.classList.toggle('print-force-hide-stability', state.stabilityData.length === 0);
         window.print();

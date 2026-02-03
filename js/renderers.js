@@ -13,16 +13,21 @@ export const renderSimpleTable = (tbodyId, data, templateId, keys) => {
         row.dataset.id = item.id;
         keys.forEach(key => {
             const el = row.querySelector(`[data-key="${key}"]`);
-            if (el) el.value = item[key] || '';
-            // Handle print content for textareas in simple tables (like Equipment notes)
-            if (el && el.tagName === 'TEXTAREA') {
-                const printEl = row.querySelector(`[data-key="${key}-print"]`);
-                if(printEl) printEl.textContent = item[key] || '';
+            if (el) {
+                el.value = item[key] || '';
+                // Handle print content for textareas in simple tables (like Equipment notes)
+                if (el.tagName === 'TEXTAREA') {
+                    const printEl = row.querySelector(`[data-key="${key}-print"]`);
+                    if(printEl) printEl.textContent = item[key] || '';
+                }
             }
         });
-        // Set localized tooltip for delete button
+        // Set localized tooltip for delete button, preserve icon
         const delBtn = row.querySelector('.delBtn');
-        if (delBtn) delBtn.setAttribute('title', t('del'));
+        if (delBtn) {
+            delBtn.title = t('del');
+            delBtn.setAttribute('aria-label', t('del'));
+        }
         
         tbody.appendChild(row);
     });
@@ -65,7 +70,10 @@ export const renderIngredients = (state) => {
         
         // Set localized tooltip
         const delBtn = row.querySelector('.delBtn');
-        if (delBtn) delBtn.setAttribute('title', t('del'));
+        if (delBtn) {
+            delBtn.title = t('del');
+            delBtn.setAttribute('aria-label', t('del'));
+        }
 
         tbody.appendChild(row);
     });
@@ -158,38 +166,50 @@ export const renderProcess = (state) => {
         // Parameters Logic
         if (numParams > 0) {
             const firstParam = step.parameters[0];
+            
+            // Clone the parameter row template
             const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
-            const paramCells = Array.from(paramTpl.querySelector('tr').children);
+            const paramRow = paramTpl.querySelector('tr');
             
-            const nameInput = paramCells[0].querySelector('input');
+            // IMPORTANT: Set the row ID to the STEP ID for context
+            paramRow.dataset.id = step.id;
+
+            const nameInput = paramRow.querySelector('[data-key="name"]');
+            const normInput = paramRow.querySelector('[data-key="norm"]');
             nameInput.value = firstParam.name || '';
-            nameInput.dataset.paramId = firstParam.id;
-            
-            const normInput = paramCells[1].querySelector('input');
             normInput.value = firstParam.norm || '';
+            nameInput.dataset.paramId = firstParam.id;
             normInput.dataset.paramId = firstParam.id;
             
-            const actionsTd = paramCells[2]; 
-            actionsTd.style.whiteSpace = 'nowrap';
-            actionsTd.innerHTML = ''; // Clear template content
+            // Setup the delete parameter button for the first row
+            const delParamBtn = paramRow.querySelector('.delParamBtn');
+            delParamBtn.dataset.paramId = firstParam.id;
+            delParamBtn.title = t('del');
 
-            // Add Parameter Button (Icon)
+            // Add "Add Parameter" and "Delete Step" buttons to the first row's action cell
+            const actionsTd = paramRow.querySelector('.row-actions');
+            actionsTd.style.whiteSpace = 'nowrap';
+            
+            // Create Add Button
             const addBtn = document.createElement('button');
             addBtn.className = 'btn primary icon-btn addParamBtn';
             addBtn.textContent = '➕';
-            addBtn.setAttribute('title', t('addParam'));
-            actionsTd.appendChild(addBtn);
+            addBtn.title = t('addParam');
+            // Insert before the delete param button
+            actionsTd.insertBefore(addBtn, delParamBtn);
 
-            // Delete Step Button (Icon)
+            // Create Delete Step Button
             const delStepBtn = document.createElement('button');
             delStepBtn.className = 'btn danger icon-btn delBtn';
             delStepBtn.textContent = '🗑️';
-            delStepBtn.setAttribute('title', t('del'));
+            delStepBtn.title = t('del');
             actionsTd.appendChild(delStepBtn);
 
-            stepRow.append(...paramCells);
+            // Append the parameter cells to the main step row
+            stepRow.append(...Array.from(paramRow.children));
             tbody.appendChild(stepRow);
 
+            // Render subsequent parameters
             for (let i = 1; i < numParams; i++) {
                 const param = step.parameters[i];
                 const subsequentParamTpl = $('#procParamRowTpl').content.cloneNode(true);
@@ -204,19 +224,14 @@ export const renderProcess = (state) => {
                 subNormInput.value = param.norm || '';
                 subNormInput.dataset.paramId = param.id;
                 
-                const actionCell = subsequentParamRow.querySelector('.row-actions');
-                actionCell.innerHTML = '';
-                
-                const delSubBtn = document.createElement('button');
-                delSubBtn.className = 'btn danger icon-btn delParamBtn';
-                delSubBtn.textContent = 'X';
-                delSubBtn.dataset.paramId = param.id;
-                delSubBtn.setAttribute('title', t('del'));
-                actionCell.appendChild(delSubBtn);
+                const subDelBtn = subsequentParamRow.querySelector('.delParamBtn');
+                subDelBtn.dataset.paramId = param.id;
+                subDelBtn.title = t('del');
 
                 tbody.appendChild(subsequentParamRow);
             }
         } else {
+            // No parameters case
             const emptyCells = `
                 <td></td><td></td>
                 <td class="no-print row-actions">
@@ -239,7 +254,10 @@ export const renderQc = (state) => {
         blockEl.dataset.id = qcBlock.id;
         blockEl.querySelector('[data-key="name"]').value = qcBlock.name || '';
         blockEl.querySelector('.delQcBtn').textContent = t('delBlock');
-        blockEl.querySelector('.addQcCheckBtn').textContent = `➕ ${t('addQcCheck')}`;
+        
+        // Fix double icon issue
+        const addBtn = blockEl.querySelector('.addQcCheckBtn');
+        addBtn.textContent = t('addQcCheck');
         
         ['qcParamName', 'qcStandard', 'qcResult', 'actions'].forEach(key => {
             const th = blockEl.querySelector(`[data-i18n="${key}"]`);
@@ -258,7 +276,8 @@ export const renderQc = (state) => {
             
             const delBtn = checkRow.querySelector('.delQcCheckBtn');
             delBtn.textContent = '🗑️'; // Icon
-            delBtn.setAttribute('title', t('del'));
+            delBtn.title = t('del');
+            delBtn.setAttribute('aria-label', t('del'));
 
             tbody.appendChild(checkRow);
         });
