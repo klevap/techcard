@@ -1,4 +1,5 @@
-import { $, $$, autoExpand, i18n } from './utils.js';
+import { $, $$, autoExpand } from './utils.js';
+import { i18n } from './i18n.js';
 
 /**
  * Renders simple key-value tables (Performance, Stability, Equipment)
@@ -27,6 +28,7 @@ export const renderIngredients = (ingredients, batchSize) => {
     const tbody = $('#formBody');
     if (!tbody) return;
     tbody.innerHTML = '';
+    const bSize = parseFloat(batchSize) || 0;
     
     let lastPhase = null;
     ingredients.forEach(ing => {
@@ -52,7 +54,7 @@ export const renderIngredients = (ingredients, batchSize) => {
                 row.querySelector(`[data-key="${key}-print"]`).textContent = ing[key] || '';
             }
         });
-        row.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(ing.percent) || 0) / 100).toFixed(3);
+        row.querySelector('.mass-cell').textContent = (bSize * (parseFloat(ing.percent) || 0) / 100).toFixed(3);
         row.querySelector('.delBtn').textContent = i18n('del');
         tbody.appendChild(row);
     });
@@ -102,43 +104,53 @@ export const renderProcess = (processSteps) => {
         });
 
         if (numParams > 0) {
-            step.parameters.forEach((param, idx) => {
-                if (idx === 0) {
-                    const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
-                    const paramCells = Array.from(paramTpl.querySelector('tr').children);
-                    paramCells[0].querySelector('input').value = param.name || '';
-                    paramCells[0].querySelector('input').dataset.paramId = param.id;
-                    paramCells[1].querySelector('input').value = param.norm || '';
-                    paramCells[1].querySelector('input').dataset.paramId = param.id;
-                    
-                    const actionsTd = paramCells[2];
-                    actionsTd.querySelector('.delParamBtn').dataset.paramId = param.id;
-                    
-                    const addBtn = document.createElement('button');
-                    addBtn.className = 'btn primary small addParamBtn';
-                    addBtn.textContent = `➕ ${i18n('addParam')}`;
-                    actionsTd.appendChild(addBtn);
+            // Handle the first parameter row which is merged with the step header
+            const firstParam = step.parameters[0];
+            const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
+            const paramCells = Array.from(paramTpl.querySelector('tr').children);
+            
+            paramCells[0].querySelector('input').value = firstParam.name || '';
+            paramCells[0].querySelector('input').dataset.paramId = firstParam.id;
+            paramCells[1].querySelector('input').value = firstParam.norm || '';
+            paramCells[1].querySelector('input').dataset.paramId = firstParam.id;
+            
+            const actionsTd = paramCells[2];
+            actionsTd.style.whiteSpace = 'nowrap';
+            
+            const delParamBtn = actionsTd.querySelector('.delParamBtn');
+            delParamBtn.dataset.paramId = firstParam.id;
+            delParamBtn.textContent = 'X';
+            
+            const addBtn = document.createElement('button');
+            addBtn.className = 'btn primary small addParamBtn';
+            addBtn.textContent = `➕ ${i18n('addParam')}`;
+            actionsTd.appendChild(addBtn);
 
-                    const delStepBtn = document.createElement('button');
-                    delStepBtn.className = 'btn danger small delBtn';
-                    delStepBtn.textContent = i18n('del');
-                    actionsTd.appendChild(delStepBtn);
+            const delStepBtn = document.createElement('button');
+            delStepBtn.className = 'btn danger small delBtn';
+            delStepBtn.textContent = i18n('del');
+            actionsTd.appendChild(delStepBtn);
 
-                    stepRow.append(...paramCells);
-                    tbody.appendChild(stepRow);
-                } else {
-                    const subTpl = $('#procParamRowTpl').content.cloneNode(true);
-                    const subRow = subTpl.querySelector('tr');
-                    subRow.dataset.id = step.id;
-                    subRow.querySelector('[data-key="name"]').value = param.name || '';
-                    subRow.querySelector('[data-key="name"]').dataset.paramId = param.id;
-                    subRow.querySelector('[data-key="norm"]').value = param.norm || '';
-                    subRow.querySelector('[data-key="norm"]').dataset.paramId = param.id;
-                    subRow.querySelector('.delParamBtn').dataset.paramId = param.id;
-                    tbody.appendChild(subRow);
-                }
-            });
+            stepRow.append(...paramCells);
+            tbody.appendChild(stepRow);
+
+            // Handle subsequent parameter rows
+            for (let i = 1; i < numParams; i++) {
+                const param = step.parameters[i];
+                const subTpl = $('#procParamRowTpl').content.cloneNode(true);
+                const subRow = subTpl.querySelector('tr');
+                subRow.dataset.id = step.id;
+                subRow.querySelector('[data-key="name"]').value = param.name || '';
+                subRow.querySelector('[data-key="name"]').dataset.paramId = param.id;
+                subRow.querySelector('[data-key="norm"]').value = param.norm || '';
+                subRow.querySelector('[data-key="norm"]').dataset.paramId = param.id;
+                const delBtn = subRow.querySelector('.delParamBtn');
+                delBtn.dataset.paramId = param.id;
+                delBtn.textContent = 'X';
+                tbody.appendChild(subRow);
+            }
         } else {
+            // Handle step without parameters
             const emptyCells = `
                 <td></td><td></td>
                 <td class="no-print row-actions">

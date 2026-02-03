@@ -166,9 +166,13 @@
             <div class="grid-span-3"><label data-i18n="productName">Наименование продукта</label><input id="productName" /></div>
             <div class="grid-span-2"><label data-i18n="productCode">Код / Артикул</label><input id="productCode" /></div>
             <div><label data-i18n="version">Версия</label><input id="docVersion" value="1.0" /></div>
-            <div class="grid-span-3"><label data-i18n="author">Технолог</label><input id="author" /></div>
-            <div class="grid-span-2"><label data-i18n="date">Дата документа</label><input id="docDate" type="date" /></div>
+            
+            <div class="grid-span-3"><label data-i18n="regulations">Нормативная документация</label><input id="regulations" /></div>
+            <div class="grid-span-2"><label data-i18n="author">Технолог</label><input id="author" /></div>
+            <div><label data-i18n="date">Дата документа</label><input id="docDate" type="date" /></div>
+            
             <div><label data-i18n="batchSize">Размер партии (кг)</label><input id="batchSize" type="number" min="0" step="0.01" value="100" /></div>
+            
             <div class="grid-span-full description-card">
                 <label data-i18n="description">Описание продукта</label>
                 <textarea id="description" rows="2"></textarea>
@@ -376,7 +380,7 @@
     </tr>
 </template>
 
-<script src="app.js" type="module"></script>
+<script src="js/main.js" type="module"></script>
 
 </body>
 </html>

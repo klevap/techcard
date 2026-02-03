@@ -2,10 +2,14 @@ import { generateId } from './utils.js';
 
 export const STORAGE_KEY = "routing_map_draft_v4.3";
 
+/**
+ * Returns the default empty state structure
+ */
 export const getInitialState = () => ({
     meta: { 
         productName: '', 
         productCode: '', 
+        regulations: '', 
         docVersion: '1.0', 
         docDate: new Date().toISOString().slice(0,10), 
         author: '', 
@@ -13,7 +17,7 @@ export const getInitialState = () => ({
         description: '' 
     },
     ingredients: [],
-    performanceData: [],
+    performanceData: [], 
     stabilityData: [],
     equipment: [],
     processSteps: [],
@@ -27,15 +31,15 @@ export function normalizeState(data) {
     const defaults = getInitialState();
     const normalized = {
         meta: { ...defaults.meta, ...(data.meta || {}) },
-        ingredients: Array.isArray(data.ingredients) ? data.ingredients : [],
-        performanceData: Array.isArray(data.performanceData) ? data.performanceData : [],
-        stabilityData: Array.isArray(data.stabilityData) ? data.stabilityData : [],
-        equipment: Array.isArray(data.equipment) ? data.equipment : [],
-        processSteps: Array.isArray(data.processSteps) ? data.processSteps : [],
-        qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : []
+        ingredients: Array.isArray(data.ingredients) ? data.ingredients : defaults.ingredients,
+        performanceData: Array.isArray(data.performanceData) ? data.performanceData : defaults.performanceData,
+        stabilityData: Array.isArray(data.stabilityData) ? data.stabilityData : defaults.stabilityData,
+        equipment: Array.isArray(data.equipment) ? data.equipment : defaults.equipment,
+        processSteps: Array.isArray(data.processSteps) ? data.processSteps : defaults.processSteps,
+        qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl
     };
 
-    // Migration: name -> tradeName
+    // Migration: old 'name' field to 'tradeName'
     normalized.ingredients.forEach(ing => {
         if (ing.name && !ing.tradeName) {
             ing.tradeName = ing.name;
@@ -51,5 +55,11 @@ export function saveToLocalStorage(state) {
 
 export function loadFromLocalStorage() {
     const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? normalizeState(JSON.parse(saved)) : null;
+    if (!saved) return null;
+    try {
+        return normalizeState(JSON.parse(saved));
+    } catch (e) {
+        console.error("Failed to parse local storage state", e);
+        return null;
+    }
 }

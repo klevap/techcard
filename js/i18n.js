@@ -12,7 +12,7 @@ export const translations = {
         printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
         printShowColumns: "Колонки:", printFunction: "Функция", printSupplier: "Поставщик", printNotes: "Примечания",
         meta: "Карточка изделия",
-        productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
+        productName: "Наименование продукта", productCode: "Код / Артикул", regulations: "Нормативная документация", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
         formulation: "Рецептура", totalPercent: "Сумма %:",
         phase: "Фаза", tradeName: "Торг. название", inciName: "INCI", func: "Функция", supplier: "Поставщик", notes: "Примечания", percent: "%", mass: "Загрузка, кг", actions: "Действия", actualMass: "Факт, кг",
         addIngredient: "➕ Добавить ингредиент",
@@ -40,7 +40,7 @@ export const translations = {
         printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
         printShowColumns: "Columns:", printFunction: "Function", printSupplier: "Supplier", printNotes: "Notes",
         meta: "Product Information",
-        productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
+        productName: "Product Name", productCode: "Code / SKU", regulations: "Regulatory Docs", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
         formulation: "Formulation", totalPercent: "Total %:",
         phase: "Phase", tradeName: "Trade Name", inciName: "INCI", func: "Function", supplier: "Supplier", notes: "Notes", percent: "%", mass: "Load, kg", actions: "Actions", actualMass: "Actual, kg",
         addIngredient: "➕ Add Ingredient",
@@ -63,8 +63,14 @@ export const translations = {
 
 let currentLang = localStorage.getItem(LANG_KEY) || 'ru';
 
+/**
+ * Returns translation by key
+ */
 export const i18n = (key) => translations[currentLang][key] || key;
 
+/**
+ * Sets application language and updates UI
+ */
 export const setLanguage = (lang, callback) => {
     currentLang = lang;
     localStorage.setItem(LANG_KEY, lang);
@@ -77,6 +83,7 @@ export const setLanguage = (lang, callback) => {
         const key = el.dataset.i18n;
         const translation = i18n(key);
         if (el.tagName === 'OPTION') {
+            // Update both text and label for cross-browser compatibility
             el.textContent = translation;
             el.label = translation;
         } else {
