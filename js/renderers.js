@@ -14,8 +14,16 @@ export const renderSimpleTable = (tbodyId, data, templateId, keys) => {
         keys.forEach(key => {
             const el = row.querySelector(`[data-key="${key}"]`);
             if (el) el.value = item[key] || '';
+            // Handle print content for textareas in simple tables (like Equipment notes)
+            if (el && el.tagName === 'TEXTAREA') {
+                const printEl = row.querySelector(`[data-key="${key}-print"]`);
+                if(printEl) printEl.textContent = item[key] || '';
+            }
         });
-        row.querySelector('.delBtn').textContent = t('del');
+        // Set localized tooltip for delete button
+        const delBtn = row.querySelector('.delBtn');
+        if (delBtn) delBtn.setAttribute('title', t('del'));
+        
         tbody.appendChild(row);
     });
 };
@@ -54,7 +62,11 @@ export const renderIngredients = (state) => {
             }
         });
         row.querySelector('.mass-cell').textContent = (batchSize * (parseFloat(ing.percent) || 0) / 100).toFixed(3);
-        row.querySelector('.delBtn').textContent = t('del');
+        
+        // Set localized tooltip
+        const delBtn = row.querySelector('.delBtn');
+        if (delBtn) delBtn.setAttribute('title', t('del'));
+
         tbody.appendChild(row);
     });
     updateTotals(state);
@@ -161,18 +173,19 @@ export const renderProcess = (state) => {
             actionsTd.style.whiteSpace = 'nowrap';
             actionsTd.innerHTML = ''; // Clear template content
 
+            // Add Parameter Button (Icon)
             const addBtn = document.createElement('button');
-            addBtn.className = 'btn primary small addParamBtn';
-            addBtn.textContent = `➕ ${t('addParam')}`;
+            addBtn.className = 'btn primary icon-btn addParamBtn';
+            addBtn.textContent = '➕';
+            addBtn.setAttribute('title', t('addParam'));
             actionsTd.appendChild(addBtn);
 
+            // Delete Step Button (Icon)
             const delStepBtn = document.createElement('button');
-            delStepBtn.className = 'btn danger small delBtn';
-            delStepBtn.textContent = t('del');
+            delStepBtn.className = 'btn danger icon-btn delBtn';
+            delStepBtn.textContent = '🗑️';
+            delStepBtn.setAttribute('title', t('del'));
             actionsTd.appendChild(delStepBtn);
-
-            // If there's a delete param button in the first row (from template), remove it or repurpose
-            // In this logic, the first row deletes the STEP, subsequent rows delete the PARAM.
 
             stepRow.append(...paramCells);
             tbody.appendChild(stepRow);
@@ -191,17 +204,24 @@ export const renderProcess = (state) => {
                 subNormInput.value = param.norm || '';
                 subNormInput.dataset.paramId = param.id;
                 
-                const delParamBtn = subsequentParamRow.querySelector('.delParamBtn');
-                delParamBtn.dataset.paramId = param.id;
-                delParamBtn.textContent = 'X';
+                const actionCell = subsequentParamRow.querySelector('.row-actions');
+                actionCell.innerHTML = '';
+                
+                const delSubBtn = document.createElement('button');
+                delSubBtn.className = 'btn danger icon-btn delParamBtn';
+                delSubBtn.textContent = 'X';
+                delSubBtn.dataset.paramId = param.id;
+                delSubBtn.setAttribute('title', t('del'));
+                actionCell.appendChild(delSubBtn);
+
                 tbody.appendChild(subsequentParamRow);
             }
         } else {
             const emptyCells = `
                 <td></td><td></td>
                 <td class="no-print row-actions">
-                    <button class="btn primary small addParamBtn">➕ ${t('addParam')}</button>
-                    <button class="btn danger small delBtn">${t('del')}</button>
+                    <button class="btn primary icon-btn addParamBtn" title="${t('addParam')}">➕</button>
+                    <button class="btn danger icon-btn delBtn" title="${t('del')}">🗑️</button>
                 </td>
                 <td class="print-only"></td>`;
             stepRow.insertAdjacentHTML('beforeend', emptyCells);
@@ -235,7 +255,11 @@ export const renderQc = (state) => {
             checkRow.dataset.checkId = check.id;
             checkRow.querySelector('[data-key="parameter"]').value = check.parameter || '';
             checkRow.querySelector('[data-key="standard"]').value = check.standard || '';
-            checkRow.querySelector('.delQcCheckBtn').textContent = 'X';
+            
+            const delBtn = checkRow.querySelector('.delQcCheckBtn');
+            delBtn.textContent = '🗑️'; // Icon
+            delBtn.setAttribute('title', t('del'));
+
             tbody.appendChild(checkRow);
         });
         container.appendChild(blockEl);

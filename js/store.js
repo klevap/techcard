@@ -13,7 +13,8 @@ const getInitialState = () => ({
     stabilityData: [],
     equipment: [],
     processSteps: [],
-    qualityControl: []
+    qualityControl: [],
+    columnWidths: {} // Stores { tableId: { colIndex: width } }
 });
 
 class Store {
@@ -34,7 +35,8 @@ class Store {
             stabilityData: Array.isArray(data.stabilityData) ? data.stabilityData : defaults.stabilityData,
             equipment: Array.isArray(data.equipment) ? data.equipment : defaults.equipment,
             processSteps: Array.isArray(data.processSteps) ? data.processSteps : defaults.processSteps,
-            qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl
+            qualityControl: Array.isArray(data.qualityControl) ? data.qualityControl : defaults.qualityControl,
+            columnWidths: data.columnWidths || defaults.columnWidths
         };
         
         // Migration logic: ensure tradeName exists if name was used
@@ -146,6 +148,14 @@ class Store {
             newState[collectionName] = newState[collectionName].filter(item => item.id !== id);
             this.setState(newState);
         }
+    }
+
+    setColumnWidth(tableId, colIndex, width) {
+        const newState = { ...this.state };
+        if (!newState.columnWidths) newState.columnWidths = {};
+        if (!newState.columnWidths[tableId]) newState.columnWidths[tableId] = {};
+        newState.columnWidths[tableId][colIndex] = width;
+        this.setState(newState);
     }
 }
 

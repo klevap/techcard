@@ -1,4 +1,4 @@
-import { $, $$, debounce, generateId, autoExpand } from './utils.js';
+import { $, $$, debounce, generateId, autoExpand, setupColumnResize } from './utils.js';
 import { store } from './store.js';
 import { setLanguage, t, getCurrentLang } from './i18n.js';
 import * as Renderers from './renderers.js';
@@ -15,20 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
         Renderers.renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']);
         Renderers.renderProcess(state);
         Renderers.renderQc(state);
+        
+        // Auto-expand all textareas after render
         $$('textarea').forEach(autoExpand);
+
+        // Setup column resizing for all tables
+        $$('table').forEach(table => setupColumnResize(table, store));
     };
 
     // Subscribe to store changes
     store.subscribe(() => {
-        // We could optimize this to only render changed sections, 
-        // but for this scale, full render is acceptable and safer.
-        // Note: Input fields losing focus on re-render is a common issue with full re-renders.
-        // However, the 'input' event handler updates state but doesn't trigger a full re-render 
-        // via store.setState immediately for every keystroke in a way that destroys DOM.
-        // The debounced save happens in background.
-        // *Correction*: If we re-render on every keystroke, we lose focus. 
-        // The store.subscribe should be used for external changes (load, clear).
-        // User input updates state silently, and we only re-render if structure changes (add/remove row).
+        // Optional: Full re-render on external changes
     });
 
     // Initial Render
@@ -75,7 +72,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     sumEl.textContent = `${sum.toFixed(2)}%`;
                     sumEl.className = Math.abs(sum - 100) < 0.01 ? 'ok' : 'bad';
                 }
-                // Phase sorting logic handled on blur or specific action, not input, to avoid jumping
             }
         }
 
@@ -88,8 +84,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const equipRow = target.closest('#equipmentBody tr[data-id]');
         if (equipRow) {
-            state.equipment.find(i => i.id == equipRow.dataset.id)[key] = value;
-            // If shortName changes, we might need to update process dropdowns, but let's do that on blur/save
+            const item = state.equipment.find(i => i.id == equipRow.dataset.id);
+            if (item) {
+                item[key] = value;
+                if (target.tagName === 'TEXTAREA') {
+                    const printEl = equipRow.querySelector(`[data-key="${key}-print"]`);
+                    if(printEl) printEl.textContent = value;
+                }
+            }
         }
 
         // Process
@@ -260,11 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Re-sort ingredients on phase change (blur/change)
         if (target.dataset.key === 'phase') {
-            const state = store.getState();
-            // Just re-render to sort
             renderAll();
         }
     });
+
+    // 4. Window Resize Handling (Responsive Textareas)
+    window.addEventListener('resize', debounce(() => {
+        $$('textarea').forEach(autoExpand);
+    }, 100));
 
     // --- TOOLBAR ACTIONS ---
 
