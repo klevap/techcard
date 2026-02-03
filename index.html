@@ -62,18 +62,24 @@
         .fill-in { min-height: 1.3em; }
         .print-content { display: none; }
         
-        .print-options-compact { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
-        .print-options-compact .option-group { display: flex; align-items: center; gap: 8px; }
-        .print-options-compact label { margin: 0; font-weight: normal; color: var(--ink); white-space: nowrap; }
-        .print-options-compact strong { font-weight: 600; color: var(--muted); }
-        .print-options-compact select { width: auto; padding: 6px 10px; }
-        .print-options-compact input[type="checkbox"] { width: auto; }
+        /* MODAL STYLES */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); }
+        .modal-content { background: var(--card); margin: 10% auto; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+        .modal-header h3 { margin: 0; font-size: 1.3rem; }
+        .modal-body .option-section { margin-bottom: 20px; }
+        .modal-body .option-section strong { display: block; margin-bottom: 10px; color: var(--muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .modal-body .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .modal-body .checkbox-item { display: flex; align-items: center; gap: 8px; }
+        .modal-body .checkbox-item input { width: auto; }
+        .modal-body .checkbox-item label { margin: 0; font-weight: normal; cursor: pointer; }
+        .modal-footer { display: flex; justify-content: flex-end; margin-top: 20px; }
 
         @media print {
             body { background: #fff; color: #000; font-size: 10px; line-height: 1.3; }
             .app { max-width: 100%; margin: 0; padding: 10px; box-shadow: none; }
             .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; padding: 10px; border-radius: 0; }
-            .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
+            .toolbar, .section-actions, .row-actions, .no-print, .modal { display: none !important; }
             h1, h2 { font-size: 1.2rem; color: #000; page-break-after: avoid; margin: 12px 0 8px; padding-bottom: 4px; border-color: #ccc; }
             h1 { font-size: 1.5rem; text-align: center; }
             textarea { display: none !important; }
@@ -126,6 +132,7 @@
                 <button class="btn lang-btn" id="langRuBtn" title="Русский">🇷🇺</button>
                 <button class="btn lang-btn" id="langEnBtn" title="English">🇬🇧</button>
             </div>
+            <button class="btn secondary" id="printSettingsBtn" data-i18n="printSettings" title="Настройки печати">⚙️</button>
             <button class="btn primary" id="printBtn" data-i18n="print">🖨️ Печать / PDF</button>
             <button class="btn secondary" id="saveBtn" data-i18n="save">💾 Сохранить JSON</button>
             <label class="btn secondary" for="loadInput" data-i18n="load">📁 Загрузить JSON</label>
@@ -134,27 +141,58 @@
         </div>
     </div>
 
-    <!-- PRINT OPTIONS (COMPACT) -->
-    <div class="card no-print">
-        <div class="print-options-compact">
-            <div class="option-group">
-                <label for="printNameSelect" data-i18n="printNamePriority">Основное наименование:</label>
-                <select id="printNameSelect">
-                    <option value="trade" data-i18n="printTradeName">Торговое название</option>
-                    <option value="inci" data-i18n="printInciName">INCI</option>
-                </select>
+    <!-- PRINT SETTINGS MODAL -->
+    <div id="printModal" class="modal no-print">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 data-i18n="printSettings">Настройки печати</h3>
+                <button class="btn secondary small" id="closeModalBtn">✕</button>
             </div>
-            <div class="option-group">
-                <strong data-i18n="printShowBlocks">Блоки:</strong>
-                <input type="checkbox" id="printShowDescription" checked><label for="printShowDescription" data-i18n="printDescription">Описание</label>
-                <input type="checkbox" id="printShowPerformance" checked><label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
-                <input type="checkbox" id="printShowStability" checked><label for="printShowStability" data-i18n="printStability">Стабильность</label>
+            <div class="modal-body">
+                <div class="option-section">
+                    <label for="printNameSelect" data-i18n="printNamePriority">Основное наименование:</label>
+                    <select id="printNameSelect">
+                        <option value="trade" data-i18n="printTradeName">Торговое название</option>
+                        <option value="inci" data-i18n="printInciName">INCI</option>
+                    </select>
+                </div>
+                <div class="option-section">
+                    <strong data-i18n="printShowBlocks">Отображать блоки:</strong>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowDescription" checked>
+                            <label for="printShowDescription" data-i18n="printDescription">Описание</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowPerformance" checked>
+                            <label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowStability" checked>
+                            <label for="printShowStability" data-i18n="printStability">Стабильность</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="option-section">
+                    <strong data-i18n="printShowColumns">Отображать колонки:</strong>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowFunction" checked>
+                            <label for="printShowFunction" data-i18n="printFunction">Функция</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowSupplier" checked>
+                            <label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="printShowNotes" checked>
+                            <label for="printShowNotes" data-i18n="printNotes">Примечания</label>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="option-group">
-                <strong data-i18n="printShowColumns">Колонки:</strong>
-                <input type="checkbox" id="printShowFunction" checked><label for="printShowFunction" data-i18n="printFunction">Функция</label>
-                <input type="checkbox" id="printShowSupplier" checked><label for="printShowSupplier" data-i18n="printSupplier">Поставщик</label>
-                <input type="checkbox" id="printShowNotes" checked><label for="printShowNotes" data-i18n="printNotes">Примечания</label>
+            <div class="modal-footer">
+                <button class="btn primary" id="applySettingsBtn" data-i18n="close">Закрыть</button>
             </div>
         </div>
     </div>

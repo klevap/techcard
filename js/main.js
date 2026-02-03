@@ -150,18 +150,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             loader.appendChild(opt);
         });
         loader.addEventListener('change', async (e) => {
-            if (!e.target.value) return;
+            const fileName = e.target.value;
+            if (!fileName) return;
             if (confirm(i18n('confirmLoadExample'))) {
-                const data = await fetchExampleData(e.target.value);
+                const data = await fetchExampleData(fileName);
                 applyState(normalizeState(data));
+                // Note: We do NOT reset e.target.value to "" here so the name stays visible
+            } else {
+                // Reset to empty if user cancelled
+                e.target.value = "";
             }
-            e.target.value = "";
         });
     } catch (e) { console.warn("Examples index could not be loaded", e); }
 
     // Language switching
     $('#langRuBtn').addEventListener('click', () => setLanguage('ru', () => UI.renderAll(state)));
     $('#langEnBtn').addEventListener('click', () => setLanguage('en', () => UI.renderAll(state)));
+
+    // Modal Logic
+    const printModal = $('#printModal');
+    $('#printSettingsBtn').addEventListener('click', () => printModal.style.display = 'block');
+    $('#closeModalBtn').addEventListener('click', () => printModal.style.display = 'none');
+    $('#applySettingsBtn').addEventListener('click', () => printModal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === printModal) printModal.style.display = 'none'; });
 
     // Toolbar Actions
     $('#printBtn').addEventListener('click', () => {
@@ -197,6 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         reader.onload = (ev) => {
             try {
                 applyState(normalizeState(JSON.parse(ev.target.result)));
+                $('#exampleLoader').value = ""; // Reset example dropdown on manual load
             } catch (err) { alert(i18n('fileReadError') + err.message); }
         };
         reader.readAsText(file);
@@ -204,7 +216,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     $('#clearBtn').addEventListener('click', () => {
-        if (confirm(i18n('confirmClear'))) applyState(getInitialState());
+        if (confirm(i18n('confirmClear'))) {
+            applyState(getInitialState());
+            $('#exampleLoader').value = ""; // Reset example dropdown
+        }
     });
 
     // Section "Add" Buttons
@@ -343,7 +358,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.body.classList.toggle('print-name-trade', namePriority === 'trade');
         document.body.classList.toggle('print-name-inci', namePriority === 'inci');
     };
-    $$('.print-options-compact input, .print-options-compact select').forEach(el => el.addEventListener('change', updatePrintClasses));
+    $$('.modal-body input, .modal-body select').forEach(el => el.addEventListener('change', updatePrintClasses));
 
     // Initial Load
     const saved = loadFromLocalStorage();

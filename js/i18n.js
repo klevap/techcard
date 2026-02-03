@@ -7,6 +7,7 @@ export const translations = {
         pageTitle: "Маршрутная карта v4.3",
         title: "Маршрутная карта",
         print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
+        printSettings: "Настройки печати", close: "Закрыть",
         printNamePriority: "Основное наименование:",
         printTradeName: "Торговое название", printInciName: "INCI",
         printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
@@ -35,6 +36,7 @@ export const translations = {
         pageTitle: "Technical Specification v4.3",
         title: "Technical Specification",
         print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
+        printSettings: "Print Settings", close: "Close",
         printNamePriority: "Primary Name:",
         printTradeName: "Trade Name", printInciName: "INCI",
         printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
@@ -83,7 +85,6 @@ export const setLanguage = (lang, callback) => {
         const key = el.dataset.i18n;
         const translation = i18n(key);
         if (el.tagName === 'OPTION') {
-            // Update both text and label for cross-browser compatibility
             el.textContent = translation;
             el.label = translation;
         } else {
