@@ -1,7 +1,8 @@
 :root {
-    --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #7f8c8d; --accent: #27ae60;
+    --bg: #f4f7f9; --card: #ffffff; --ink: #2c3e50; --muted: #95a5a6; --accent: #27ae60;
     --danger: #e74c3c; --warn: #f39c12; --line: #dfe4ea; --header-bg: #ecf0f1;
     --primary-btn-bg: #3498db; --primary-btn-border: #2980b9;
+    --hover-bg: #f8f9fa;
 }
 html, body { height: 100%; }
 body {
@@ -10,7 +11,6 @@ body {
 }
 body.resizing { cursor: col-resize; user-select: none; }
 
-/* Reduced max-width for better readability on 2K+ screens */
 .app { max-width: 1280px; margin: 24px auto; padding: 0 16px 64px; }
 
 h1 { font-size: 1.8rem; margin: 0; color: #34495e; }
@@ -33,14 +33,13 @@ input, select, textarea, button {
 }
 input:focus, select:focus, textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); }
 
-/* Auto-expanding textarea styles */
 textarea { 
     resize: none; 
     overflow-y: hidden; 
-    height: auto; /* Allow auto calculation */
+    height: auto; 
     line-height: 1.4;
     white-space: pre-wrap; 
-    word-break: break-word; /* Force wrap to trigger height change */
+    word-break: break-word; 
 }
 
 /* --- STYLES FOR EQUIPMENT CHIPS --- */
@@ -71,28 +70,59 @@ textarea {
 
 .ok { color: var(--accent); } .bad { color: var(--danger); }
 
-/* Button Styles */
-.btn { cursor: pointer; transition: all .1s ease; user-select: none; border: none; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
-.btn:hover { opacity: 0.9; } .btn:active { transform: scale(0.98); }
-.btn.primary { background: var(--primary-btn-bg); } .btn.secondary { background: #95a5a6; } .btn.danger { background: var(--danger); }
+/* --- BUTTON STYLES (MODERNIZED) --- */
+.btn { 
+    cursor: pointer; transition: all .2s ease; user-select: none; 
+    border: 1px solid transparent; width: auto; display: inline-flex; 
+    align-items: center; justify-content: center; gap: 6px; 
+    font-weight: 500;
+}
+.btn:hover { opacity: 0.9; transform: translateY(-1px); } 
+.btn:active { transform: translateY(0); }
 
-/* Compact Button Styles */
-.btn.small { padding: 4px 10px; font-size: .85rem; border-radius: 6px; height: 32px; }
+/* Toolbar Buttons */
+.btn.primary { background: var(--primary-btn-bg); color: #fff; } 
+.btn.secondary { background: #fff; border-color: var(--line); color: var(--ink); }
+.btn.secondary:hover { border-color: var(--muted); background: var(--hover-bg); }
+.btn.danger { background: var(--danger); color: #fff; }
+
+/* Minimalistic Delete Button (Cross) */
 .btn.icon-btn { 
-    padding: 0; width: 32px; height: 32px; border-radius: 6px; 
-    font-size: 1.1rem; line-height: 1; 
+    padding: 0; width: 24px; height: 24px; border-radius: 4px; 
+    font-size: 1.2rem; line-height: 1; background: transparent;
+    color: #bdc3c7; border: none;
+}
+.btn.icon-btn:hover { 
+    color: var(--danger); 
+    background: rgba(231, 76, 60, 0.1); 
 }
 
-.lang-btn { background: #fff; color: var(--ink); padding: 6px 12px; font-size: 1.2rem; line-height: 1; }
-.lang-btn.active { outline: 2px solid var(--primary-btn-bg); box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
+/* Add Buttons (Styled) */
+.btn.small { 
+    padding: 6px 14px; font-size: .85rem; border-radius: 6px; height: auto; 
+}
+.btn.primary.small {
+    background: #ebf5fb;
+    color: var(--primary-btn-bg);
+    border: 1px solid rgba(52, 152, 219, 0.3);
+    font-weight: 600;
+}
+.btn.primary.small:hover {
+    background: var(--primary-btn-bg);
+    color: #fff;
+    border-color: var(--primary-btn-bg);
+}
 
-.row-actions { display: flex; gap: 6px; align-items: center; justify-content: center; }
+.lang-btn { background: #fff; color: var(--ink); padding: 6px 12px; font-size: 1.2rem; line-height: 1; border: 1px solid var(--line); }
+.lang-btn.active { border-color: var(--primary-btn-bg); background: #ebf5fb; }
+
+.row-actions { display: flex; gap: 4px; align-items: center; justify-content: center; }
 
 /* Table Styles & Resizing */
 table { 
     width: 100%; 
     border-collapse: collapse; 
-    table-layout: fixed; /* Critical for precise column resizing */
+    table-layout: fixed; /* Critical for resizing */
 }
 th, td { 
     border: 1px solid var(--line); 
@@ -106,15 +136,24 @@ th { background: var(--header-bg); font-weight: 600; color: #34495e; white-space
 
 /* Resize Handle */
 .resize-handle {
-    position: absolute; top: 0; right: 0; width: 8px; height: 100%;
+    position: absolute; top: 0; right: 0; width: 5px; height: 100%;
     cursor: col-resize; user-select: none;
     transition: background 0.2s; z-index: 10;
-    opacity: 0;
 }
-.resize-handle:hover, th:hover .resize-handle { opacity: 1; background: rgba(52, 152, 219, 0.5); }
+.resize-handle:hover, th:hover .resize-handle { background: #3498db; }
 
 .phase-header td { background: #3498db; color: white; font-weight: bold; padding: 4px 8px; }
 .step-header td { background: var(--header-bg); font-weight: bold; }
+
+/* Process Table Specifics */
+.step-description { position: relative; padding-right: 28px !important; }
+.step-delete-btn {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    opacity: 0.4;
+}
+.step-description:hover .step-delete-btn { opacity: 1; }
 
 .kpi { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 .kpi .box { background: var(--header-bg); border: 1px solid var(--line); padding: 6px 12px; border-radius: 8px; }
@@ -138,7 +177,7 @@ input[type="number"] { text-align: right; }
     body { background: #fff; color: #000; font-size: 10px; line-height: 1.3; }
     .app { max-width: 100%; margin: 0; padding: 10px; box-shadow: none; }
     .card { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; padding: 10px; border-radius: 0; }
-    .toolbar, .section-actions, .row-actions, .no-print, .resize-handle { display: none !important; }
+    .toolbar, .section-actions, .row-actions, .no-print, .resize-handle, .step-delete-btn { display: none !important; }
     h1, h2 { font-size: 1.2rem; color: #000; page-break-after: avoid; margin: 12px 0 8px; padding-bottom: 4px; border-color: #ccc; }
     h1 { font-size: 1.5rem; text-align: center; }
     textarea, select, .equip-add-select, .chip-remove { display: none !important; }

@@ -23,7 +23,7 @@
                 <button class="btn lang-btn" id="langRuBtn" title="Русский">🇷🇺</button>
                 <button class="btn lang-btn" id="langEnBtn" title="English">🇬🇧</button>
             </div>
-            <button class="btn primary" id="printBtn" data-i18n="print">🖨️ Печать / PDF</button>
+            <button class="btn secondary" id="printBtn" data-i18n="print">🖨️ Печать / PDF</button>
             <button class="btn secondary" id="saveBtn" data-i18n="save">💾 Сохранить JSON</button>
             <label class="btn secondary" for="loadInput" data-i18n="load">📁 Загрузить JSON</label>
             <input type="file" id="loadInput" class="no-print" accept=".json" style="display:none" />
@@ -83,15 +83,16 @@
         </div>
         <table id="formTable">
             <thead><tr>
-                <th data-i18n="phase" style="width: 60px;">Фаза</th>
+                <!-- Removed inline widths to allow 100% fill and proper resizing -->
+                <th data-i18n="phase">Фаза</th>
                 <th class="trade-col" data-i18n="tradeName">Торг. название</th>
                 <th class="inci-col" data-i18n="inciName">INCI</th>
                 <th class="func-col" data-i18n="func">Функция</th>
                 <th class="supplier-col" data-i18n="supplier">Поставщик</th>
                 <th class="notes-col" data-i18n="notes">Примечания</th>
-                <th data-i18n="percent" style="width: 70px;">%</th>
-                <th data-i18n="mass" style="width: 80px;">Загрузка, кг</th>
-                <th class="no-print" data-i18n="actions" style="width: 40px;"></th>
+                <th data-i18n="percent">%</th>
+                <th data-i18n="mass">Загрузка, кг</th>
+                <th class="no-print"></th> <!-- Actions header empty -->
                 <th class="print-only" data-i18n="actualMass">Факт, кг</th>
             </tr></thead>
             <tbody id="formBody"></tbody>
@@ -106,7 +107,7 @@
             <thead><tr>
                 <th data-i18n="perfParam">Параметр</th>
                 <th data-i18n="perfValue">Значение</th>
-                <th class="no-print" data-i18n="actions" style="width: 40px;"></th>
+                <th class="no-print"></th>
             </tr></thead>
             <tbody id="perfBody"></tbody>
         </table>
@@ -120,7 +121,7 @@
             <thead><tr>
                 <th data-i18n="stabCondition">Условие</th>
                 <th data-i18n="stabResult">Результат</th>
-                <th class="no-print" data-i18n="actions" style="width: 40px;"></th>
+                <th class="no-print"></th>
             </tr></thead>
             <tbody id="stabBody"></tbody>
         </table>
@@ -132,10 +133,10 @@
         <h2 data-i18n="equipmentList">Список оборудования</h2>
         <table id="equipmentTable">
             <thead><tr>
-                <th data-i18n="eqShortName" style="width: 100px;">ID / Код</th>
+                <th data-i18n="eqShortName">ID / Код</th>
                 <th data-i18n="eqFullName">Полное наименование</th>
                 <th data-i18n="eqNotes">Примечания / Функция</th>
-                <th class="no-print" data-i18n="actions" style="width: 40px;"></th>
+                <th class="no-print"></th>
             </tr></thead>
             <tbody id="equipmentBody"></tbody>
         </table>
@@ -147,12 +148,12 @@
         <h2 data-i18n="process">Технологический процесс</h2>
         <table id="procTable">
             <thead><tr>
-                <th data-i18n="step" style="width: 40px;">№</th>
+                <th data-i18n="step">№</th>
                 <th data-i18n="opDescription">Описание операции</th>
                 <th data-i18n="equipment">Оборудование</th>
                 <th data-i18n="paramName">Параметр процесса</th>
                 <th data-i18n="norm">Норма</th>
-                <th class="no-print" data-i18n="actions" style="width: 80px;"></th>
+                <th class="no-print"></th> <!-- Actions for Parameters -->
                 <th class="print-only" data-i18n="actual">Факт</th>
             </tr></thead>
             <tbody id="procBody"></tbody>
@@ -197,7 +198,7 @@
         <td><input class="data-field text-center" data-key="percent" type="number" min="0" max="100" step="0.01" value="0"></td>
         <td class="mass-cell" style="text-align: right;">0.000</td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delBtn" title="Delete">🗑️</button>
+            <button class="btn icon-btn delBtn" title="Delete">✕</button>
         </td>
         <td class="print-only"><div class="fill-in"></div></td>
     </tr>
@@ -208,7 +209,7 @@
         <td><input class="data-field" data-key="parameter"></td>
         <td><input class="data-field" data-key="value"></td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delBtn" title="Delete">🗑️</button>
+            <button class="btn icon-btn delBtn" title="Delete">✕</button>
         </td>
     </tr>
 </template>
@@ -218,7 +219,7 @@
         <td><input class="data-field" data-key="condition"></td>
         <td><input class="data-field" data-key="result"></td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delBtn" title="Delete">🗑️</button>
+            <button class="btn icon-btn delBtn" title="Delete">✕</button>
         </td>
     </tr>
 </template>
@@ -232,7 +233,7 @@
             <div class="print-content" data-key="notes-print"></div>
         </td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delBtn" title="Delete">🗑️</button>
+            <button class="btn icon-btn delBtn" title="Delete">✕</button>
         </td>
     </tr>
 </template>
@@ -243,6 +244,8 @@
         <td class="step-description" style="vertical-align: middle;">
             <textarea class="data-field" data-key="description" rows="2"></textarea>
             <div class="print-content" data-key="description-print"></div>
+            <!-- Delete Step Button moved here for clarity -->
+            <button class="btn icon-btn step-delete-btn delBtn" title="Delete Step">✕</button>
         </td>
         <td class="step-equipment" style="vertical-align: middle;">
             <div class="equipment-widget no-print">
@@ -262,7 +265,7 @@
         <td><input class="data-field" data-key="name"></td>
         <td><input class="data-field" data-key="norm"></td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delParamBtn" title="Delete parameter">✕</button>
+            <button class="btn icon-btn delParamBtn" title="Delete parameter">✕</button>
         </td>
         <td class="print-only"><div class="fill-in"></div></td>
     </tr>
@@ -272,14 +275,14 @@
     <div class="qc-block" style="margin-bottom: 20px;">
         <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
             <input class="data-field" data-key="name" style="font-weight:bold; font-size:1.1rem; border:none; border-bottom:1px solid #ccc; flex:1;">
-            <button class="btn danger small delQcBtn no-print" data-i18n="delBlock">Удалить блок</button>
+            <button class="btn icon-btn delQcBtn no-print" title="Delete block">✕</button>
         </div>
         <table>
             <thead><tr>
                 <th data-i18n="qcParamName">Наименование показателя</th>
                 <th data-i18n="qcStandard">Норматив</th>
                 <th data-i18n="qcResult">Результат</th>
-                <th style="width: 50px;" class="no-print" data-i18n="actions"></th>
+                <th style="width: 50px;" class="no-print"></th>
             </tr></thead>
             <tbody></tbody>
         </table>
@@ -295,7 +298,7 @@
         <td><input class="data-field" data-key="standard"></td>
         <td><div class="fill-in"></div></td>
         <td class="no-print row-actions">
-            <button class="btn danger icon-btn delQcCheckBtn" title="Delete">🗑️</button>
+            <button class="btn icon-btn delQcCheckBtn" title="Delete">✕</button>
         </td>
     </tr>
 </template>

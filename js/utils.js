@@ -40,8 +40,10 @@ export const autoExpand = (textarea) => {
 };
 
 /**
- * Enable column resizing for a table with cascading behavior
- * Keeps total table width constant.
+ * Enable column resizing for a table using "Neighbor Resize" logic.
+ * This ensures the table width remains fixed at 100% and the right boundary doesn't shift.
+ * Resizing column [i] affects column [i] and [i+1].
+ * 
  * @param {HTMLElement} table - The table element
  * @param {Object} store - The application store instance
  */
@@ -62,8 +64,7 @@ export const setupColumnResize = (table, store) => {
     });
 
     headers.forEach((th, index) => {
-        // Don't add handle to the last column as resizing it doesn't make sense 
-        // in a fixed-width context without affecting the right boundary
+        // Don't add handle to the last column
         if (index === headers.length - 1) return;
 
         // Skip if handle already exists
@@ -78,8 +79,11 @@ export const setupColumnResize = (table, store) => {
             e.stopPropagation();
             
             const startX = e.pageX;
-            // Capture current widths of all columns in pixels
-            const startWidths = headers.map(h => h.offsetWidth);
+            const currentHeader = th;
+            const nextHeader = headers[index + 1];
+            
+            const startWidthCurrent = currentHeader.offsetWidth;
+            const startWidthNext = nextHeader.offsetWidth;
             
             document.body.classList.add('resizing');
 
@@ -88,66 +92,27 @@ export const setupColumnResize = (table, store) => {
                     const currentX = e.pageX;
                     const delta = currentX - startX;
                     
-                    // We are resizing the boundary between column [index] and [index+1]
-                    // If delta > 0 (Right): Col [index] grows, Col [index+1...] shrinks
-                    // If delta < 0 (Left): Col [index...] shrinks, Col [index+1] grows
+                    // Calculate new widths
+                    // If delta > 0 (Right): Current grows, Next shrinks
+                    // If delta < 0 (Left): Current shrinks, Next grows
+                    
+                    let newWidthCurrent = startWidthCurrent + delta;
+                    let newWidthNext = startWidthNext - delta;
 
-                    const newWidths = [...startWidths];
-
-                    if (delta > 0) {
-                        // Moving Right
-                        // 1. Grow the left column (index)
-                        newWidths[index] = startWidths[index] + delta;
-                        
-                        // 2. Shrink right columns (cascade)
-                        let remainingDelta = delta;
-                        for (let i = index + 1; i < headers.length; i++) {
-                            const available = startWidths[i] - MIN_WIDTH;
-                            const shrinkAmount = Math.min(available, remainingDelta);
-                            
-                            newWidths[i] = startWidths[i] - shrinkAmount;
-                            remainingDelta -= shrinkAmount;
-                            
-                            if (remainingDelta <= 0) break;
-                        }
-                        
-                        // If we couldn't distribute the full delta (hit right edge limits), 
-                        // we must limit the growth of the left column to match what was actually shrunk
-                        const actualShrunk = delta - remainingDelta;
-                        newWidths[index] = startWidths[index] + actualShrunk;
-
-                    } else {
-                        // Moving Left (delta is negative)
-                        const absDelta = Math.abs(delta);
-                        
-                        // 1. Grow the right column (index + 1)
-                        newWidths[index + 1] = startWidths[index + 1] + absDelta;
-
-                        // 2. Shrink left columns (cascade backwards)
-                        let remainingDelta = absDelta;
-                        for (let i = index; i >= 0; i--) {
-                            const available = startWidths[i] - MIN_WIDTH;
-                            const shrinkAmount = Math.min(available, remainingDelta);
-                            
-                            newWidths[i] = startWidths[i] - shrinkAmount;
-                            remainingDelta -= shrinkAmount;
-                            
-                            if (remainingDelta <= 0) break;
-                        }
-
-                        // If we couldn't distribute the full delta (hit left edge limits),
-                        // limit the growth of the right column
-                        const actualShrunk = absDelta - remainingDelta;
-                        newWidths[index + 1] = startWidths[index + 1] + actualShrunk;
+                    // Enforce minimum widths
+                    if (newWidthCurrent < MIN_WIDTH) {
+                        newWidthCurrent = MIN_WIDTH;
+                        newWidthNext = startWidthNext + (startWidthCurrent - MIN_WIDTH);
+                    } else if (newWidthNext < MIN_WIDTH) {
+                        newWidthNext = MIN_WIDTH;
+                        newWidthCurrent = startWidthCurrent + (startWidthNext - MIN_WIDTH);
                     }
 
-                    // Apply new widths
-                    headers.forEach((h, i) => {
-                        h.style.width = `${newWidths[i]}px`;
-                    });
+                    // Apply widths
+                    currentHeader.style.width = `${newWidthCurrent}px`;
+                    nextHeader.style.width = `${newWidthNext}px`;
 
                     // Trigger auto-expand for all textareas in the table
-                    // This fixes the issue where text doesn't reflow/resize during column drag
                     const textareas = table.querySelectorAll('textarea');
                     textareas.forEach(ta => autoExpand(ta));
                 });

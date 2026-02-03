@@ -22,7 +22,7 @@ export const renderSimpleTable = (tbodyId, data, templateId, keys) => {
                 }
             }
         });
-        // Set localized tooltip for delete button, preserve icon
+        // Set localized tooltip for delete button
         const delBtn = row.querySelector('.delBtn');
         if (delBtn) {
             delBtn.title = t('del');
@@ -119,6 +119,10 @@ export const renderProcess = (state) => {
         descCell.querySelector('[data-key="description"]').value = step.description || '';
         descCell.querySelector('[data-key="description-print"]').textContent = step.description || '';
         descCell.setAttribute('rowspan', rowspan);
+        
+        // Setup Delete Step Button (Now inside description cell)
+        const delStepBtn = descCell.querySelector('.step-delete-btn');
+        delStepBtn.title = t('del'); // "Delete Step"
 
         // Equipment - Chips Logic
         const equipCell = stepRow.querySelector('.step-equipment');
@@ -186,24 +190,18 @@ export const renderProcess = (state) => {
             delParamBtn.dataset.paramId = firstParam.id;
             delParamBtn.title = t('del');
 
-            // Add "Add Parameter" and "Delete Step" buttons to the first row's action cell
+            // Add "Add Parameter" button to the first row's action cell
             const actionsTd = paramRow.querySelector('.row-actions');
             actionsTd.style.whiteSpace = 'nowrap';
             
-            // Create Add Button
+            // Create Add Button (Minimalist Plus)
             const addBtn = document.createElement('button');
-            addBtn.className = 'btn primary icon-btn addParamBtn';
+            addBtn.className = 'btn icon-btn addParamBtn';
+            addBtn.style.color = 'var(--primary-btn-bg)';
             addBtn.textContent = '➕';
             addBtn.title = t('addParam');
             // Insert before the delete param button
             actionsTd.insertBefore(addBtn, delParamBtn);
-
-            // Create Delete Step Button
-            const delStepBtn = document.createElement('button');
-            delStepBtn.className = 'btn danger icon-btn delBtn';
-            delStepBtn.textContent = '🗑️';
-            delStepBtn.title = t('del');
-            actionsTd.appendChild(delStepBtn);
 
             // Append the parameter cells to the main step row
             stepRow.append(...Array.from(paramRow.children));
@@ -235,8 +233,7 @@ export const renderProcess = (state) => {
             const emptyCells = `
                 <td></td><td></td>
                 <td class="no-print row-actions">
-                    <button class="btn primary icon-btn addParamBtn" title="${t('addParam')}">➕</button>
-                    <button class="btn danger icon-btn delBtn" title="${t('del')}">🗑️</button>
+                    <button class="btn icon-btn addParamBtn" style="color: var(--primary-btn-bg);" title="${t('addParam')}">➕</button>
                 </td>
                 <td class="print-only"></td>`;
             stepRow.insertAdjacentHTML('beforeend', emptyCells);
@@ -253,7 +250,9 @@ export const renderQc = (state) => {
         const blockEl = blockTpl.querySelector('.qc-block');
         blockEl.dataset.id = qcBlock.id;
         blockEl.querySelector('[data-key="name"]').value = qcBlock.name || '';
-        blockEl.querySelector('.delQcBtn').textContent = t('delBlock');
+        
+        const delBlockBtn = blockEl.querySelector('.delQcBtn');
+        delBlockBtn.title = t('delBlock');
         
         // Fix double icon issue
         const addBtn = blockEl.querySelector('.addQcCheckBtn');
@@ -275,7 +274,6 @@ export const renderQc = (state) => {
             checkRow.querySelector('[data-key="standard"]').value = check.standard || '';
             
             const delBtn = checkRow.querySelector('.delQcCheckBtn');
-            delBtn.textContent = '🗑️'; // Icon
             delBtn.title = t('del');
             delBtn.setAttribute('aria-label', t('del'));
 

@@ -85,6 +85,9 @@ export const setLanguage = (lang, callback) => {
 
     $$('[data-i18n]').forEach(el => {
         const key = el.dataset.i18n;
+        // Skip actions header as we removed text
+        if (key === 'actions') return;
+        
         const translation = t(key);
         if (el.tagName === 'OPTION') {
             el.textContent = translation;
