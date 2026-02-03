@@ -12,14 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
             print: "🖨️ Печать / PDF", save: "💾 Сохранить JSON", load: "📁 Загрузить JSON", clear: "❌ Очистить форму",
             printNamePriority: "Основное наименование:",
             printTradeName: "Торговое название", printInciName: "INCI",
-            printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Эффективность", printStability: "Стабильность",
+            printShowBlocks: "Блоки:", printDescription: "Описание", printPerformance: "Тех. параметры", printStability: "Стабильность",
             printShowColumns: "Колонки:", printFunction: "Функция", printSupplier: "Поставщик", printNotes: "Примечания",
             meta: "Карточка изделия",
             productName: "Наименование продукта", productCode: "Код / Артикул", version: "Версия", date: "Дата документа", author: "Технолог", batchSize: "Размер партии (кг)", description: "Описание продукта",
             formulation: "Рецептура", totalPercent: "Сумма %:",
             phase: "Фаза", tradeName: "Торг. название", inciName: "INCI", func: "Функция", supplier: "Поставщик", notes: "Примечания", percent: "%", mass: "Загрузка, кг", actions: "Действия", actualMass: "Факт, кг",
             addIngredient: "➕ Добавить ингредиент",
-            performance: "Данные об эффективности", perfParam: "Параметр", perfValue: "Значение", addPerf: "➕ Добавить параметр",
+            performance: "Технические параметры", perfParam: "Параметр", perfValue: "Значение", addPerf: "➕ Добавить параметр",
             stability: "Данные о стабильности", stabCondition: "Условие", stabResult: "Результат", addStab: "➕ Добавить тест",
             equipmentList: "Список оборудования", eqShortName: "ID / Код", eqFullName: "Полное наименование", eqNotes: "Примечания / Функция", addEquipment: "➕ Добавить оборудование",
             process: "Технологический процесс", step: "№", opDescription: "Описание операции", equipment: "Оборудование", paramName: "Параметр процесса", norm: "Норма", actual: "Факт",
@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
             qcParamName: "Наименование показателя", qcStandard: "Норматив", qcResult: "Результат",
             loadExample: "-- Загрузить пример --",
             confirmLoadExample: "Вы уверены? Все несохраненные данные в текущей форме будут заменены данными из примера.",
+            addEquipPlaceholder: "➕ Добавить..."
         },
         en: {
             pageTitle: "Technical Specification v4.3",
@@ -40,14 +41,14 @@ document.addEventListener('DOMContentLoaded', () => {
             print: "🖨️ Print / PDF", save: "💾 Save JSON", load: "📁 Load JSON", clear: "❌ Clear Form",
             printNamePriority: "Primary Name:",
             printTradeName: "Trade Name", printInciName: "INCI",
-            printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Performance", printStability: "Stability",
+            printShowBlocks: "Blocks:", printDescription: "Description", printPerformance: "Tech. Params", printStability: "Stability",
             printShowColumns: "Columns:", printFunction: "Function", printSupplier: "Supplier", printNotes: "Notes",
             meta: "Product Information",
             productName: "Product Name", productCode: "Code / SKU", version: "Version", date: "Document Date", author: "Technologist", batchSize: "Batch Size (kg)", description: "Product Description",
             formulation: "Formulation", totalPercent: "Total %:",
             phase: "Phase", tradeName: "Trade Name", inciName: "INCI", func: "Function", supplier: "Supplier", notes: "Notes", percent: "%", mass: "Load, kg", actions: "Actions", actualMass: "Actual, kg",
             addIngredient: "➕ Add Ingredient",
-            performance: "Performance Data", perfParam: "Parameter", perfValue: "Value", addPerf: "➕ Add Parameter",
+            performance: "Technical Parameters", perfParam: "Parameter", perfValue: "Value", addPerf: "➕ Add Parameter",
             stability: "Stability Data", stabCondition: "Condition", stabResult: "Result", addStab: "➕ Add Test",
             equipmentList: "Equipment List", eqShortName: "ID / Code", eqFullName: "Full Name", eqNotes: "Notes / Function", addEquipment: "➕ Add Equipment",
             process: "Technological Process", step: "#", opDescription: "Operation Description", equipment: "Equipment", paramName: "Process Parameter", norm: "Standard", actual: "Actual",
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
             qcParamName: "Parameter Name", qcStandard: "Standard", qcResult: "Result",
             loadExample: "-- Load Example --",
             confirmLoadExample: "Are you sure? All unsaved data in the current form will be replaced with the example data.",
+            addEquipPlaceholder: "➕ Add..."
         }
     };
     let currentLang = localStorage.getItem(LANG_KEY) || 'ru';
@@ -79,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const key = el.dataset.i18n;
             const translation = i18n(key);
             if (el.tagName === 'OPTION') {
-                // Для option нужно обновлять и текст, и label для совместимости
                 el.textContent = translation;
                 el.label = translation;
             } else {
@@ -101,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const autoExpand = (textarea) => {
+        if (!textarea || textarea.tagName !== 'TEXTAREA') return;
         textarea.style.height = 'auto';
         textarea.style.height = textarea.scrollHeight + 'px';
     };
@@ -193,6 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderProcess = () => {
         const tbody = $('#procBody');
         tbody.innerHTML = '';
+        
+        // Prepare equipment options map for quick lookup
+        const equipmentMap = {};
+        state.equipment.forEach(eq => {
+            equipmentMap[eq.shortName] = eq;
+        });
+
         state.processSteps.forEach(step => {
             const numParams = step.parameters?.length || 0;
             const rowspan = numParams > 0 ? numParams : 1;
@@ -210,13 +219,81 @@ document.addEventListener('DOMContentLoaded', () => {
             input.value = step.number || '';
             numberCell.appendChild(input);
 
-            ['description', 'equipment'].forEach(key => {
-                const cell = stepRow.querySelector(`.step-${key}`);
-                cell.querySelector(`[data-key="${key}"]`).value = step[key] || '';
-                cell.querySelector(`[data-key="${key}-print"]`).textContent = step[key] || '';
-                cell.setAttribute('rowspan', rowspan);
+            // Description
+            const descCell = stepRow.querySelector('.step-description');
+            descCell.querySelector('[data-key="description"]').value = step.description || '';
+            descCell.querySelector('[data-key="description-print"]').textContent = step.description || '';
+            descCell.setAttribute('rowspan', rowspan);
+
+            // Equipment - Chips Logic
+            const equipCell = stepRow.querySelector('.step-equipment');
+            equipCell.setAttribute('rowspan', rowspan);
+            
+            const chipsContainer = equipCell.querySelector('.chips-container');
+            const addSelect = equipCell.querySelector('.equip-add-select');
+            const hiddenInput = equipCell.querySelector('input[data-key="equipment"]');
+            const printDiv = equipCell.querySelector('[data-key="equipment-print"]');
+            
+            // Set placeholder for add select
+            addSelect.options[0].textContent = i18n('addEquipPlaceholder');
+
+            // Parse current equipment string
+            const currentEquipString = step.equipment || '';
+            hiddenInput.value = currentEquipString;
+            printDiv.textContent = currentEquipString;
+            
+            const selectedIds = currentEquipString ? currentEquipString.split(',').map(s => s.trim()).filter(s => s) : [];
+
+            // Render Chips
+            selectedIds.forEach(id => {
+                const eqData = equipmentMap[id];
+                const label = eqData ? id : id; // Just ID if not found in list
+                const title = eqData ? `${eqData.shortName} - ${eqData.fullName}` : id;
+
+                const chip = document.createElement('div');
+                chip.className = 'chip';
+                chip.title = title;
+                chip.innerHTML = `
+                    <span>${label}</span>
+                    <span class="chip-remove" data-val="${id}">×</span>
+                `;
+                
+                // Remove handler
+                chip.querySelector('.chip-remove').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const valToRemove = e.target.dataset.val;
+                    const newIds = selectedIds.filter(v => v !== valToRemove);
+                    step.equipment = newIds.join(', ');
+                    // Re-render this step (or whole process) to update UI
+                    renderProcess();
+                    debouncedSave();
+                });
+
+                chipsContainer.appendChild(chip);
             });
 
+            // Populate Add Dropdown (exclude already selected)
+            state.equipment.forEach(eq => {
+                if (!selectedIds.includes(eq.shortName)) {
+                    const option = document.createElement('option');
+                    option.value = eq.shortName;
+                    option.textContent = `${eq.shortName} ${eq.fullName ? '- ' + eq.fullName : ''}`;
+                    addSelect.appendChild(option);
+                }
+            });
+
+            // Add handler
+            addSelect.addEventListener('change', (e) => {
+                const newVal = e.target.value;
+                if (newVal) {
+                    selectedIds.push(newVal);
+                    step.equipment = selectedIds.join(', ');
+                    renderProcess();
+                    debouncedSave();
+                }
+            });
+
+            // Parameters Logic
             if (numParams > 0) {
                 const firstParam = step.parameters[0];
                 const paramTpl = $('#procParamRowTpl').content.cloneNode(true);
@@ -347,8 +424,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const handleUpdate = (e) => {
         if (!e.target.classList.contains('data-field')) return;
+        
+        // Reset example loader if user modifies data
+        const exampleLoader = $('#exampleLoader');
+        if (exampleLoader.value !== "") {
+            exampleLoader.value = "";
+        }
+
         const key = e.target.dataset.key;
-        const value = e.target.value;
+        let value = e.target.value;
 
         const findAndSet = (collection, row, key, value) => {
             const item = collection.find(i => i.id == row.dataset.id);
@@ -395,7 +479,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (stabRow) findAndSet(state.stabilityData, stabRow, key, value);
 
         const equipRow = e.target.closest('#equipmentBody tr[data-id]');
-        if (equipRow) findAndSet(state.equipment, equipRow, key, value);
+        if (equipRow) {
+            findAndSet(state.equipment, equipRow, key, value);
+            // Re-render process to update dropdown options if equipment name changed
+            if (key === 'shortName' || key === 'fullName') {
+                renderProcess();
+            }
+        }
 
         const procRow = e.target.closest('#procBody tr[data-id]');
         if (procRow) {
@@ -460,12 +550,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm(i18n('confirmLoadExample'))) {
                 const validatedState = normalizeState(data);
                 loadState(validatedState);
+                // Keep the selected value to show which example is loaded
+                exampleLoader.value = fileName;
+                saveState(); // Save immediately so it persists on reload
                 alert(i18n('dataLoaded'));
+            } else {
+                // Reset selection if cancelled
+                exampleLoader.value = "";
             }
         } catch (error) {
             console.error(`Ошибка загрузки примера '${fileName}':`, error);
             alert(`Не удалось загрузить пример: ${error.message}`);
-        } finally {
             exampleLoader.value = "";
         }
     }
@@ -508,6 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const loaded = JSON.parse(ev.target.result);
                     const validatedState = normalizeState(loaded);
                     loadState(validatedState); 
+                    exampleLoader.value = ""; // Reset example loader on manual file load
                     alert(i18n('dataLoaded'));
                 } catch (err) { alert(i18n('fileReadError') + err.message); }
             };
@@ -518,6 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm(i18n('confirmClear'))) {
                 localStorage.removeItem(STORAGE_KEY);
                 loadState(getInitialState());
+                exampleLoader.value = "";
             }
         });
 
@@ -541,6 +638,8 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#addEquipmentBtn').addEventListener('click', () => {
             state.equipment.push({ id: generateId(), shortName: '', fullName: '', notes: '' });
             renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']);
+            // Re-render process to update dropdowns
+            renderProcess();
             debouncedSave();
         });
         $('#addProcBtn').addEventListener('click', () => {
@@ -580,7 +679,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if ($('#formBody').contains(row)) { state.ingredients = state.ingredients.filter(i => i.id != id); renderIngredients(); needsSave = true; }
                 if ($('#perfBody').contains(row)) { state.performanceData = state.performanceData.filter(i => i.id != id); renderSimpleTable('#perfBody', state.performanceData, '#perfRowTpl', ['parameter', 'value']); needsSave = true; }
                 if ($('#stabBody').contains(row)) { state.stabilityData = state.stabilityData.filter(i => i.id != id); renderSimpleTable('#stabBody', state.stabilityData, '#stabRowTpl', ['condition', 'result']); needsSave = true; }
-                if ($('#equipmentBody').contains(row)) { state.equipment = state.equipment.filter(i => i.id != id); renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']); needsSave = true; }
+                if ($('#equipmentBody').contains(row)) { 
+                    state.equipment = state.equipment.filter(i => i.id != id); 
+                    renderSimpleTable('#equipmentBody', state.equipment, '#equipmentRowTpl', ['shortName', 'fullName', 'notes']); 
+                    renderProcess(); // Update dropdowns
+                    needsSave = true; 
+                }
                 if ($('#procBody').contains(row)) { state.processSteps = state.processSteps.filter(s => s.id != id); renderProcess(); needsSave = true; }
             }
             if (e.target.classList.contains('delParamBtn')) {
@@ -609,7 +713,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderQc(); needsSave = true;
                 }
             }
-            if (needsSave) debouncedSave();
+            if (needsSave) {
+                // If structure changed, example is modified
+                exampleLoader.value = "";
+                debouncedSave();
+            }
         });
 
         document.body.addEventListener('input', (e) => {

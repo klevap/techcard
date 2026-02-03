@@ -29,6 +29,26 @@
         }
         input:focus, select:focus, textarea:focus { outline: 2px solid #3498db; border-color: transparent; }
         textarea { resize: none; overflow-y: hidden; min-height: 40px; }
+        
+        /* --- STYLES FOR EQUIPMENT CHIPS --- */
+        .equipment-widget { display: flex; flex-direction: column; gap: 6px; }
+        .chips-container { display: flex; flex-wrap: wrap; gap: 6px; min-height: 28px; }
+        .chip { 
+            background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb;
+            padding: 2px 8px; border-radius: 16px; font-size: 0.85rem; 
+            display: inline-flex; align-items: center; gap: 6px; user-select: none;
+        }
+        .chip-remove { 
+            cursor: pointer; font-weight: bold; font-size: 1rem; line-height: 1; 
+            color: #1565c0; opacity: 0.6; transition: opacity 0.2s;
+        }
+        .chip-remove:hover { opacity: 1; color: #d32f2f; }
+        .equip-add-select { 
+            padding: 4px 8px; font-size: 0.85rem; color: var(--muted); 
+            border: 1px dashed var(--line); cursor: pointer;
+        }
+        .equip-add-select:hover { border-color: var(--primary-btn-bg); color: var(--ink); }
+
         .grid { display: grid; gap: 16px; }
         .meta-grid { grid-template-columns: repeat(6, 1fr); }
         .meta-grid .grid-span-full { grid-column: 1 / -1; }
@@ -76,8 +96,8 @@
             .toolbar, .section-actions, .row-actions, .no-print { display: none !important; }
             h1, h2 { font-size: 1.2rem; color: #000; page-break-after: avoid; margin: 12px 0 8px; padding-bottom: 4px; border-color: #ccc; }
             h1 { font-size: 1.5rem; text-align: center; }
-            textarea { display: none !important; }
-            input, select { border: none; padding: 0; background: transparent; color: #000; -webkit-print-color-adjust: exact; width: 100%; font-size: inherit; font-family: inherit; box-shadow: none; outline: none; }
+            textarea, select, .equip-add-select, .chip-remove { display: none !important; }
+            input { border: none; padding: 0; background: transparent; color: #000; -webkit-print-color-adjust: exact; width: 100%; font-size: inherit; font-family: inherit; box-shadow: none; outline: none; }
             .print-content { display: block !important; white-space: pre-wrap; word-break: break-word; font-family: inherit; font-size: inherit; }
             table { page-break-inside: auto; table-layout: fixed; }
             tr { page-break-inside: avoid; page-break-after: auto; }
@@ -85,6 +105,12 @@
             th, .phase-header td { background-color: #e0e0e0 !important; color: #000 !important; -webkit-print-color-adjust: exact; }
             .print-only { display: table-cell !important; }
             .fill-in { border-bottom: none; }
+            
+            /* Print styles for chips */
+            .chips-container { display: block; }
+            .chip { background: transparent; border: none; padding: 0; color: #000; display: inline; }
+            .chip::after { content: ", "; }
+            .chip:last-child::after { content: ""; }
 
             .card .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; padding: 0; }
             .card .meta-grid > div { grid-column: auto !important; display: flex; align-items: baseline; border-bottom: 1px dotted #ccc; padding: 2px 0; }
@@ -147,7 +173,7 @@
             <div class="option-group">
                 <strong data-i18n="printShowBlocks">Блоки:</strong>
                 <input type="checkbox" id="printShowDescription" checked><label for="printShowDescription" data-i18n="printDescription">Описание</label>
-                <input type="checkbox" id="printShowPerformance" checked><label for="printShowPerformance" data-i18n="printPerformance">Эффективность</label>
+                <input type="checkbox" id="printShowPerformance" checked><label for="printShowPerformance" data-i18n="printPerformance">Тех. параметры</label>
                 <input type="checkbox" id="printShowStability" checked><label for="printShowStability" data-i18n="printStability">Стабильность</label>
             </div>
             <div class="option-group">
@@ -202,9 +228,9 @@
         <div class="section-actions no-print"><button class="btn primary small" id="addIngredientBtn" data-i18n="addIngredient">➕ Добавить ингредиент</button></div>
     </div>
 
-    <!-- PERFORMANCE DATA -->
+    <!-- PERFORMANCE DATA (RENAMED TO TECHNICAL PARAMETERS) -->
     <div class="card performance-card">
-        <h2 data-i18n="performance">Данные об эффективности</h2>
+        <h2 data-i18n="performance">Технические параметры</h2>
         <table id="perfTable">
             <thead><tr>
                 <th style="width:40%" data-i18n="perfParam">Параметр</th>
@@ -331,7 +357,16 @@
             <div class="print-content" data-key="description-print"></div>
         </td>
         <td class="step-equipment" style="vertical-align: middle;">
-            <textarea class="data-field" data-key="equipment" rows="2"></textarea>
+            <!-- New Widget Structure -->
+            <div class="equipment-widget no-print">
+                <div class="chips-container"></div>
+                <select class="equip-add-select">
+                    <option value="" disabled selected>➕ Добавить...</option>
+                </select>
+            </div>
+            <!-- Hidden input to store data for compatibility -->
+            <input type="hidden" class="data-field" data-key="equipment">
+            <!-- Print view -->
             <div class="print-content" data-key="equipment-print"></div>
         </td>
     </tr>
